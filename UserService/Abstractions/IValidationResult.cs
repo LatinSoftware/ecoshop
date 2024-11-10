@@ -1,4 +1,4 @@
-﻿using UserService.Exceptions;
+﻿using UserService.Errors;
 
 namespace UserService.Abstractions
 {

@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using UserService.Abstractions;
-using UserService.Exceptions;
+using UserService.Errors;
 
 namespace UserService.Shared
 {

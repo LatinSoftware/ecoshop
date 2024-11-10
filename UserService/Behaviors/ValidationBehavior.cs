@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using FluentValidation;
 using MediatR;
-using UserService.Exceptions;
+using UserService.Errors;
 
 namespace UserService.Behaviors
 {
