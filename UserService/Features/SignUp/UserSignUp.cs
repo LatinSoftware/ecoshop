@@ -1,25 +1,67 @@
 ﻿using FluentResults;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using UserService.Abstractions;
+using UserService.Database;
 using UserService.Entities;
+using UserService.Shared;
 
 namespace UserService.Features.SignUp
 {
     public class UserSignUp
     {
-        public record Command(string Name, Email Email, string Password, string CPassword, Address Address) : ICommand;
+        public record Command(string Name, string Email, string Password, string CPassword, Address Address) : ICommand;
 
-        public sealed class Handler : ICommandHandler<Command>
+        public sealed class Handler(ApplicationContext context) : ICommandHandler<Command>
         {
-            public Task<Result> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
             {
-                throw new NotImplementedException();
+
+                if(request.Password != request.CPassword)
+                    return Result.Fail(UserErrorMessage.PasswordsMismatch);
+
+                var password = Password.Create(request.Password);
+
+                if(password.IsFailed)
+                    return Result.Fail(password.Errors);
+
+                if(await context.Users.AnyAsync(u => u.Email == new Email(request.Email), cancellationToken: cancellationToken))
+                    return Result.Fail(UserErrorMessage.EmailAlreadyExist);
+
+                
+                var user = User.Create(request.Name, new Email(request.Email), password.Value, request.Address);
+
+                if (user.IsFailed)
+                    return Result.Fail(user.Errors);
+
+                await context.Users.AddAsync(user.Value, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+                return Result.Ok();
             }
+
+           
         }
 
         public sealed class CommandValidator : AbstractValidator<Command>
         {
-            public CommandValidator() { 
+            public CommandValidator()
+            {
+                RuleFor(u => u.Name).NotNull().NotEmpty().MaximumLength(100);
+                RuleFor(u => u.Email).NotNull().EmailAddress();
+                RuleFor(u => u.Password).NotNull().NotEmpty().MaximumLength(50);
+                RuleFor(u => u.CPassword).NotNull().NotEmpty();
+                RuleFor(u => u.Address).SetValidator(new AddressValidator());
+            }
+        }
+
+        public class AddressValidator : AbstractValidator<Address>
+        {
+            public AddressValidator()
+            {
+                RuleFor(a => a.Street).NotNull().NotEmpty().MaximumLength(200);
+                RuleFor(a => a.Sector).NotNull().NotEmpty().MaximumLength(150);
+                RuleFor(a => a.City).NotNull().NotEmpty().MaximumLength(100);
+                RuleFor(a => a.Country).NotNull().NotEmpty().MaximumLength(100);
             }
         }
 

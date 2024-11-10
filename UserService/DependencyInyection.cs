@@ -23,7 +23,10 @@ namespace UserService
                 options.RegisterServicesFromAssembly(typeof(Program).Assembly);
                 options.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             });
+
             services.AddAutoMapper(typeof(Program).Assembly);
+
+            services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
             return services;
         }

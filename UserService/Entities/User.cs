@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using UserService.Helpers;
 using UserService.Shared;
 
 namespace UserService.Entities
@@ -14,6 +15,8 @@ namespace UserService.Entities
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
 
+        private User(){}
+
         private User(UserId id, string name, Email email, Password password, Address address, Role? role)
         {
             Id = id;
@@ -26,10 +29,9 @@ namespace UserService.Entities
             UpdatedAt = DateTime.UtcNow;
         }
 
-        public static Result<User> Create(string name, Email email, Password password, Address address, Role? role)
+        public static Result<User> Create(string name, Email email, Password password, Address address, Role? role = Role.User)
         {
             var validationResult = Result.Merge(
-                    IsValidPassword(password.Value),
                     IsValidName(name),
                     IsValidEmail(email.Value),
                     IsValidAddress(address)
@@ -49,21 +51,15 @@ namespace UserService.Entities
         private static Result IsValidEmail(string email)
         {
 
-            return Result.FailIf(email.Contains("@") && email.Contains("."), UserErrorMessage.EmailInvalid);
+            return Result.FailIf(!email.Contains("@") && !email.Contains("."), UserErrorMessage.EmailInvalid);
         }
 
-        private static Result IsValidPassword(string password)
-        {
-            return Result.Merge(
-                    Result.FailIf(password.Length < 8, UserErrorMessage.PasswordInvalidLenght),
-                    Result.FailIf(!password.Any(char.IsPunctuation), UserErrorMessage.PasswordInvalidSpecialChar)
-                );
-        }
+      
 
         private static Result IsValidAddress(Address address)
         {
             return Result.Merge(
-                Result.FailIf(string.IsNullOrWhiteSpace(address.Street), UserErrorMessage.SteetAddressRequired),
+                Result.FailIf(string.IsNullOrWhiteSpace(address.Street), UserErrorMessage.StreetAddressRequired),
                 Result.FailIf(string.IsNullOrWhiteSpace(address.Sector), UserErrorMessage.SectorAddressRequired),
                 Result.FailIf(string.IsNullOrWhiteSpace(address.City), UserErrorMessage.CityAddressRequired),
                 Result.FailIf(string.IsNullOrWhiteSpace(address.Country), UserErrorMessage.CountryAddressRequired)
@@ -82,7 +78,31 @@ namespace UserService.Entities
         User
     }
     public record UserId(Guid Value);
-    public record Password(string Value, string Salt);
+    public record Password()
+    {
+        private Password(string value, string hash) : this()
+        {
+            Value = value;
+            Salt = hash;
+        }
+        public string Value { get; private set; } = string.Empty;
+        public string Salt { get; private set; } = string.Empty;
+
+        public static Result<Password> Create(string value)
+        {
+
+            var validation = Result.Merge(
+                    Result.FailIf(value.Length < 8, UserErrorMessage.PasswordInvalidLength),
+                    Result.FailIf(!value.Any(char.IsPunctuation), UserErrorMessage.PasswordInvalidSpecialChar)
+                );
+
+            if (validation.IsFailed)
+                return validation;
+
+            var password = PasswordHasher.HashPassword(value, out string salt);
+            return Result.Ok(new Password(password, salt));
+        }
+    };
     public record Email(string Value);
     public record Address(string Street, string Sector, string City, string Country);
 }
