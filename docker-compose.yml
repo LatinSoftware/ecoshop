@@ -1,0 +1,28 @@
+version: '3.8'
+services:
+  product_db:
+    image: postgres:latest
+    container_name: productdb
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: product
+    ports:
+      - '5433:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  user_db:
+    image: postgres:latest
+    container_name: userdb
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: user
+    ports:
+      - '5434:5432'
+    volumes:
+      - pgdata_user:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+  pgdata_user:

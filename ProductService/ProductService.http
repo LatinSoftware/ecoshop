@@ -1,0 +1,81 @@
+@ProductService_HostAddress = http://localhost:5237/api/v1
+
+// CATEGORIES REQUEST
+GET {{ProductService_HostAddress}}/categories
+Accept: application/json
+
+###
+
+GET {{ProductService_HostAddress}}/categories/3011778b-0296-466f-9b41-affb947683d1
+Accept: application/json
+###
+
+POST {{ProductService_HostAddress}}/categories
+Content-Type: application/json
+
+{
+  "name": "Category #2"
+}
+
+###
+
+PATCH {{ProductService_HostAddress}}/categories/3011778b-0296-466f-9b41-affb947683d
+Content-Type: application/json
+
+{
+  "name": "updated #1"
+}
+
+###
+
+DELETE {{ProductService_HostAddress}}/categories/4706442e-ab5d-47a7-9117-4722d2e4ace7
+Accept: application/json
+###
+
+POST {{ProductService_HostAddress}}/products
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "",
+  "price": 20.50,
+  "description": "este es un producto de prueba",
+  "categoryId": "470ef532-903a-4ea5-9587-8f322e550c89"
+}
+
+###
+
+PUT {{ProductService_HostAddress}}/products/4177ff9e-77b8-40c4-9706-9d8533a6bead
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "product #2",
+  "description": "este es un producto de prueba #2 y debe tener minimo 50 caracteres, esto es un fastidio debido a que probando cosas, no se me ocurre realmente nadca",
+  "price": 50.35
+}
+###
+
+DELETE {{ProductService_HostAddress}}/products/4177ff9e-77b8-40c4-9706-9d8533a6bead
+Accept: application/json
+###
+
+GET {{ProductService_HostAddress}}/products
+Accept: application/json
+###
+
+GET {{ProductService_HostAddress}}/products?categoryid=fafaa776-86fd-412e-bec0-4196a86a5244
+Accept: application/json
+###
+
+GET {{ProductService_HostAddress}}/products?name=laptop
+Accept: application/json
+###
+
+GET {{ProductService_HostAddress}}/products?minprice=50&maxprice=1000
+Accept: application/json
+###
+
+GET {{ProductService_HostAddress}}/products/2227c154-63f8-41b9-ad60-48dd20c8e81c
+Accept: application/json
+###

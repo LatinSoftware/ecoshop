@@ -1,0 +1,88 @@
+﻿using FluentResults;
+using UserService.Shared;
+
+namespace UserService.Entities
+{
+    public class User
+    {
+        public UserId Id { get; private set; }
+        public string Name { get; private set; } = string.Empty;
+        public Email Email { get; private set; }
+        public Password Password { get; private set; }
+        public Address Address { get; private set; }
+        public Role Role { get; private set; }
+        public DateTime CreatedAt { get; private set; }
+        public DateTime UpdatedAt { get; private set; }
+
+        private User(UserId id, string name, Email email, Password password, Address address, Role? role)
+        {
+            Id = id;
+            Name = name;
+            Email = email;
+            Password = password;
+            Address = address;
+            Role = role ?? Role.User;
+            CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
+        }
+
+        public static Result<User> Create(string name, Email email, Password password, Address address, Role? role)
+        {
+            var validationResult = Result.Merge(
+                    IsValidPassword(password.Value),
+                    IsValidName(name),
+                    IsValidEmail(email.Value),
+                    IsValidAddress(address)
+                );
+
+            if (validationResult.IsFailed)
+                return validationResult;
+
+
+
+            var userId = new UserId(Guid.NewGuid());
+
+            return Result.Ok(new User(userId, name, email, password, address, role));
+
+        }
+
+        private static Result IsValidEmail(string email)
+        {
+
+            return Result.FailIf(email.Contains("@") && email.Contains("."), UserErrorMessage.EmailInvalid);
+        }
+
+        private static Result IsValidPassword(string password)
+        {
+            return Result.Merge(
+                    Result.FailIf(password.Length < 8, UserErrorMessage.PasswordInvalidLenght),
+                    Result.FailIf(!password.Any(char.IsPunctuation), UserErrorMessage.PasswordInvalidSpecialChar)
+                );
+        }
+
+        private static Result IsValidAddress(Address address)
+        {
+            return Result.Merge(
+                Result.FailIf(string.IsNullOrWhiteSpace(address.Street), UserErrorMessage.SteetAddressRequired),
+                Result.FailIf(string.IsNullOrWhiteSpace(address.Sector), UserErrorMessage.SectorAddressRequired),
+                Result.FailIf(string.IsNullOrWhiteSpace(address.City), UserErrorMessage.CityAddressRequired),
+                Result.FailIf(string.IsNullOrWhiteSpace(address.Country), UserErrorMessage.CountryAddressRequired)
+              );
+        }
+        private static Result IsValidName(string name)
+        {
+            return Result.FailIf(string.IsNullOrWhiteSpace(name), UserErrorMessage.NameRequired);
+        }
+
+    }
+
+    public enum Role
+    {
+        Admin,
+        User
+    }
+    public record UserId(Guid Value);
+    public record Password(string Value, string Salt);
+    public record Email(string Value);
+    public record Address(string Street, string Sector, string City, string Country);
+}
