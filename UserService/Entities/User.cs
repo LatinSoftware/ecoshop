@@ -29,6 +29,34 @@ namespace UserService.Entities
             UpdatedAt = DateTime.UtcNow;
         }
 
+        public void SetName(string? name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return;
+
+            Name = name;
+        }
+
+        public void SetRole(Role? role)
+        {
+            if (!role.HasValue)
+                return;
+
+            if(Role == role.Value) return;
+
+            Role = role.Value;
+        }
+
+        public void SetAddress(Address? address)
+        {
+            if(address == null) return;
+            var street = address.Street ?? Address.Street;
+            var sector = address.Sector ?? Address.Sector;
+            var country = address.Country ?? Address.Country;
+            var city = address.City ?? Address.City;
+            Address = new Address(street, sector, city, country);
+        }
+
         public static Result<User> Create(string name, Email email, Password password, Address address, Role? role = Role.User)
         {
             var validationResult = Result.Merge(
