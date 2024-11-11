@@ -96,7 +96,7 @@ namespace ProductService.Features.Products.Filter
             // arrange
             var query = new ProductFilterQuery
             {
-                Description = "descripcion"
+                Description = "description"
             };
             // act
             var result = await productFixture.sender.Send(query);
