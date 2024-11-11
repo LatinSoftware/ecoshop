@@ -1,5 +1,9 @@
-@UserService_HostAddress = http://localhost:5213
+@UserService_HostAddress = http://localhost:5214/api/v1
 
+GET {{UserService_HostAddress}}/users?page=1&pagesize=10
+Accept: application/json
+###
 
-
+GET {{UserService_HostAddress}}/users?page=2&pagesize=5
+Accept: application/json
 ###

@@ -47,15 +47,11 @@ namespace UserService.Entities
             return Result.Ok(new User(userId, name, email, password, address, role));
 
         }
-
         private static Result IsValidEmail(string email)
         {
 
             return Result.FailIf(!email.Contains("@") && !email.Contains("."), UserErrorMessage.EmailInvalid);
         }
-
-      
-
         private static Result IsValidAddress(Address address)
         {
             return Result.Merge(
