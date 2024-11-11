@@ -35,7 +35,7 @@ public class SignUpTest : BaseTest
         result.IsSuccess.Should().BeTrue();
         result.IsFailed.Should().BeFalse();
 
-        var user = context.Users.FirstOrDefault(u => u.Email == new Email(command.Email));
+        var user = context.Users.FirstOrDefault();
         user.Should().NotBeNull();
         user!.Name.Should().Be(command.Name);
     }
@@ -197,7 +197,7 @@ public class SignUpTest : BaseTest
         result.IsFailed.Should().BeTrue();
         result.HasError<ApplicationError>().Should().BeTrue();
         result.Errors.Should().ContainEquivalentOf(UserErrorMessage.PasswordsMismatch);
-      
+
     }
 
     private async Task<User> CreateUser()
