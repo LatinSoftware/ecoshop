@@ -1,5 +1,7 @@
-﻿using FluentResults;
+﻿using System.Security.Cryptography;
+using FluentResults;
 using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UserService.Abstractions;
 using UserService.Database;
@@ -17,18 +19,18 @@ namespace UserService.Features.SignUp
             public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
             {
 
-                if(request.Password != request.CPassword)
+                if (request.Password != request.CPassword)
                     return Result.Fail(UserErrorMessage.PasswordsMismatch);
 
                 var password = Password.Create(request.Password);
 
-                if(password.IsFailed)
+                if (password.IsFailed)
                     return Result.Fail(password.Errors);
 
-                if(await context.Users.AnyAsync(u => u.Email == new Email(request.Email), cancellationToken: cancellationToken))
+                if (await context.Users.AnyAsync(u => u.Email == new Email(request.Email), cancellationToken: cancellationToken))
                     return Result.Fail(UserErrorMessage.EmailAlreadyExist);
 
-                
+
                 var user = User.Create(request.Name, new Email(request.Email), password.Value, request.Address);
 
                 if (user.IsFailed)
@@ -39,7 +41,7 @@ namespace UserService.Features.SignUp
                 return Result.Ok();
             }
 
-           
+
         }
 
         public sealed class CommandValidator : AbstractValidator<Command>
@@ -69,7 +71,18 @@ namespace UserService.Features.SignUp
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                throw new NotImplementedException();
+                app.MapPost("signup", async (Command command, ISender sender) =>
+                {
+                    var result = await sender.Send(command);
+
+                    return result switch
+                    {
+                        { IsSuccess: true } => Results.Created(),
+                        { IsFailed: true, Errors: var error } when result.HasError(error => error.HasMetadata("code", value => (string)value == UserErrorMessage.EmailAlreadyExist.Code)) => Results.Conflict(error),
+                        _ => Results.BadRequest(result.Errors)
+
+                    };
+                });
             }
         }
     }
