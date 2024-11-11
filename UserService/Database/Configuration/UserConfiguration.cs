@@ -34,7 +34,7 @@ namespace UserService.Database.Configuration
 
             builder.OwnsOne(u => u.Password, password =>
             {
-                password.Property(p => p.Value).HasColumnName("PasswordHash").IsRequired().HasMaxLength(200);
+                password.Property(p => p.Value).HasColumnName("Password").IsRequired().HasMaxLength(200);
                 password.Property(p => p.Salt).HasColumnName("PasswordSalt").IsRequired().HasMaxLength(100);
             });
 
