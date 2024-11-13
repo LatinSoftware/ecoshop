@@ -52,7 +52,7 @@ namespace UserService.Features.SignUp
                 RuleFor(u => u.Email).NotNull().EmailAddress();
                 RuleFor(u => u.Password).NotNull().NotEmpty().MaximumLength(50);
                 RuleFor(u => u.CPassword).NotNull().NotEmpty();
-                RuleFor(u => u.Address).SetValidator(new AddressValidator());
+                RuleFor(u => u.Address).NotNull().SetValidator(new AddressValidator());
             }
         }
 
