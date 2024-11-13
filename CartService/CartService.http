@@ -1,6 +1,13 @@
-@CartService_HostAddress = http://localhost:5174
+@CartService_HostAddress = http://localhost:5174/api/v1
 
-GET {{CartService_HostAddress}}/weatherforecast/
-Accept: application/json
+POST {{CartService_HostAddress}}/cart
+Content-Type: application/json
+
+{
+  "userId": "c844b543-f864-4663-a13b-ce8fd9ea3a8e",
+  "items": []
+}
 
 ###
+
+

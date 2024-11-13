@@ -22,7 +22,21 @@ services:
       - '5434:5432'
     volumes:
       - pgdata_user:/var/lib/postgresql/data
+  cartdb:
+    image: mongo:latest
+    container_name: cartdb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - '27017:27017'
+    volumes:
+      - cartata:/etc/mongo
+     
+  
+  
 
 volumes:
   pgdata:
   pgdata_user:
+  cartata:

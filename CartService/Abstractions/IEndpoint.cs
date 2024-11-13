@@ -1,4 +1,4 @@
-﻿namespace UserService.Abstractions
+﻿namespace CartService.Abstractions
 {
     public interface IEndpoint
     {

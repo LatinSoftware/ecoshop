@@ -1,6 +1,6 @@
-﻿using UserService.Errors;
+﻿using CartService.Errors;
 
-namespace UserService.Abstractions
+namespace CartService.Abstractions
 {
     public interface IValidationResult
     {

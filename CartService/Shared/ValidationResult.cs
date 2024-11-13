@@ -1,6 +1,6 @@
-﻿using CartService.Errors;
+﻿using CartService.Abstractions;
+using CartService.Errors;
 using FluentResults;
-using UserService.Abstractions;
 
 namespace CartService.Shared
 {

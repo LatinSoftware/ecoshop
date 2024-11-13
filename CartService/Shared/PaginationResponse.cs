@@ -1,5 +1,3 @@
-using System;
-using Microsoft.EntityFrameworkCore;
 
 namespace CartService.Shared;
 
@@ -28,8 +26,10 @@ public class PaginationResponse<T>
 
     public static async Task<PaginationResponse<T>> CreateAsync(IQueryable<T> query, int page, int pageSize, Func<int, string> generatePageUrl)
     {
-        var totalCount = await query.CountAsync();
-        var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
+        var totalCount = query.Count();
+        var items =  query.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+        await Task.CompletedTask;
 
         return new(items, page, totalCount, pageSize, generatePageUrl);
     }

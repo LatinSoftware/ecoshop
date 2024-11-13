@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using MediatR;
 
-namespace UserService.Abstractions
+namespace CartService.Abstractions
 {
     public interface ICommandBase : IRequest<Result>
     {

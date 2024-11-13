@@ -1,9 +1,15 @@
-﻿using CartService.Behaviors;
+﻿using CartService.Abstractions;
+using CartService.Abstractions.Repositories;
+using CartService.Behaviors;
+using CartService.Database.Repositories;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using System.Reflection;
-using UserService.Abstractions;
 
 namespace CartService
 {
@@ -11,7 +17,12 @@ namespace CartService
     {
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
         {
-            
+
+            BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+            var mongoClient = new MongoClient(configuration.GetConnectionString("CartDatabase"));
+            var mongoDatabase = mongoClient.GetDatabase(configuration["DatabaseName"]);
+            services.AddSingleton(provider => mongoDatabase);
+
             services.AddMediatR(options =>
             {
                 options.RegisterServicesFromAssembly(typeof(Program).Assembly);
@@ -21,6 +32,10 @@ namespace CartService
             services.AddAutoMapper(typeof(Program).Assembly);
 
             services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+            
+
+            services.AddSingleton<ICartRepository, CartRepository>();
 
            
 
