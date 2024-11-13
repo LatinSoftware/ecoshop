@@ -1,9 +1,53 @@
 @UserService_HostAddress = http://localhost:5214/api/v1
 
-GET {{UserService_HostAddress}}/users?page=1&pagesize=10
+GET {{UserService_HostAddress}}/users?page=1&pagesize=10&name=caonabo
 Accept: application/json
 ###
 
 GET {{UserService_HostAddress}}/users?page=2&pagesize=5
 Accept: application/json
+###
+
+POST {{UserService_HostAddress}}/signup
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Caonabo Mena Perez",
+  "email": "cmenadoers@gmail.com",
+  "password": "ramon123456.",
+  "cpassword": "ramon123456.",
+  "address": {
+    "street": "calle los llanos #21",
+    "sector": "los rios",
+    "city": "Distrito Nacional",
+    "country": "Dominican Republic"
+  }
+}
+
+###
+
+POST {{UserService_HostAddress}}/signin
+Content-Type: application/json
+Accept: application/json
+
+{
+  "email": "cmenadoers@gmail.com",
+  "password": "ramon123456."
+}
+
+###
+
+
+PATCH {{UserService_HostAddress}}/users/35044957-f525-44d2-abaa-6ce7bbfa7062
+Content-Type: application/json
+Accept: application/json
+
+{
+  "address": 
+  {
+    "country": "Republica Dominicana"
+  }
+}
+
 ###

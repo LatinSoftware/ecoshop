@@ -40,7 +40,8 @@ Accept: application/json
   "name": "",
   "price": 20.50,
   "description": "este es un producto de prueba",
-  "categoryId": "470ef532-903a-4ea5-9587-8f322e550c89"
+  "categoryId": "470ef532-903a-4ea5-9587-8f322e550c89",
+
 }
 
 ###
