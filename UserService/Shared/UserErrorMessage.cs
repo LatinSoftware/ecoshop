@@ -15,7 +15,7 @@ namespace UserService.Shared
         public static DomainError CityAddressRequired { get; } = new("User.Address.City", "City is required");
         public static DomainError CountryAddressRequired { get; } = new("User.Address.Country", "Country is required");
         public static ApplicationError EmailAlreadyExist {get; } = new ("Email.AlreadyExist", "Email already exist in our records");
-        public static ApplicationError PasswordsMismatch {get; } = new ("Password.Mismatch", "Password mismatch, please repeat again");
+        public static ApplicationError PasswordsMismatch {get; } = new ("Password.Mismatch", "Password mismatch, please try again");
         public static ApplicationError UserNotFound(UserId id) => new("User.NotFound", $"User with id '{id.Value}' not found or is deleted");
 
     }

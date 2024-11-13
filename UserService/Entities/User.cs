@@ -1,4 +1,5 @@
 ﻿using FluentResults;
+using MediatR;
 using UserService.Helpers;
 using UserService.Shared;
 
@@ -56,6 +57,8 @@ namespace UserService.Entities
             var city = address.City ?? Address.City;
             Address = new Address(street, sector, city, country);
         }
+
+        public bool PasswordMatch(string password) => PasswordHasher.VerifyPassword(password, Password.Salt, Password.Value);
 
         public static Result<User> Create(string name, Email email, Password password, Address address, Role? role = Role.User)
         {

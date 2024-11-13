@@ -6,6 +6,7 @@ using System.Reflection;
 using UserService.Abstractions;
 using UserService.Behaviors;
 using UserService.Database;
+using UserService.Providers;
 
 namespace UserService
 {
@@ -27,6 +28,8 @@ namespace UserService
             services.AddAutoMapper(typeof(Program).Assembly);
 
             services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+            services.AddSingleton<TokenProvider>();
 
             return services;
         }

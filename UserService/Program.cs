@@ -1,5 +1,8 @@
 using Asp.Versioning;
 using Asp.Versioning.Builder;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using UserService;
 using UserService.Database;
 
@@ -7,6 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddServices(builder.Configuration);
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =>
+    {
+        o.RequireHttpsMetadata = false;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)),
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
 builder.Services.AddEndpoints(typeof(Program).Assembly);
 builder.Services.AddApiVersioning().AddApiExplorer();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -39,6 +57,9 @@ RouteGroupBuilder versionedGroup = app
     .WithApiVersionSet(apiVersionSet);
 
 app.MapEndpoints(versionedGroup);
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
 
