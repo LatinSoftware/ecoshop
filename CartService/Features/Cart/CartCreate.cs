@@ -6,9 +6,9 @@ using FluentResults;
 using FluentValidation;
 using MediatR;
 
-namespace CartService.Features
+namespace CartService.Features.Cart
 {
-    public class CartCreate
+    public partial class CartCreate
     {
         public record Command(Guid UserId, List<CartItemRequest> Items) : ICommand<Cart>;
         public sealed class Handler(ICartRepository repository) : ICommandHandler<Command, Cart>
@@ -41,16 +41,6 @@ namespace CartService.Features
             }
         }
 
-        public sealed class CartItemValidator : AbstractValidator<CartItemRequest>
-        {
-            public CartItemValidator()
-            {
-                RuleFor(c => c.ProductId).NotNull().NotEmpty();
-                RuleFor(c => c.Quantity).NotNull().GreaterThan(0);
-                RuleFor(c => c.Price).NotNull().GreaterThanOrEqualTo(0).PrecisionScale(10,2, false);
-            }
-        }
-
         public sealed class Endpoint : IEndpoint
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
@@ -62,7 +52,7 @@ namespace CartService.Features
                     if (result.IsFailed)
                         return Results.BadRequest(result.Value);
 
-                    return Results.CreatedAtRoute("userCart", new {userId = command.UserId}, result.Value);
+                    return Results.CreatedAtRoute("userCart", new { userId = command.UserId }, result.Value);
                 });
             }
         }

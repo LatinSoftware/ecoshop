@@ -15,5 +15,7 @@
 
         public static CartItem Create(string CartId, Guid ProductId, int Quantity, decimal Price, decimal total)
         => new() { CartId = CartId, ProductId = ProductId, Quantity = Quantity, Price = Price, Total =  total};
+
+        public void SetQuantity(int quantity) => Quantity = quantity;
     }
 }

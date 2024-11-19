@@ -6,11 +6,11 @@ using CartService.Models;
 using FluentResults;
 using MediatR;
 
-namespace CartService.Features
+namespace CartService.Features.Cart
 {
     public class CartByUser
     {
-        public record Query(Guid UserId): IQuery<CartModel>;
+        public record Query(Guid UserId) : IQuery<CartModel>;
         public sealed class Handler(ICartRepository repository, IMapper mapper) : IQueryHandler<Query, CartModel>
         {
             public async Task<Result<CartModel>> Handle(Query request, CancellationToken cancellationToken)
@@ -28,9 +28,9 @@ namespace CartService.Features
 
         public sealed class Mapping : Profile
         {
-            public Mapping() 
-            { 
-                CreateMap<Cart,  CartModel>();
+            public Mapping()
+            {
+                CreateMap<Cart, CartModel>();
                 CreateMap<CartItem, CartItemResponse>();
             }
         }
@@ -43,7 +43,7 @@ namespace CartService.Features
                 {
                     var result = await sender.Send(new Query(userId));
 
-                    if(result.IsFailed) return Results.NotFound(result.Errors);
+                    if (result.IsFailed) return Results.NotFound(result.Errors);
 
                     return Results.Ok(result.Value);
                 })

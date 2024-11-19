@@ -34,6 +34,13 @@ namespace CartService.Entities
             Total = items.Sum(x => x.Total);
             UpdatedAt = DateTime.UtcNow;
         }
+
+        public void DeleteItem(CartItem item)
+        {
+            if (!items.Contains(item)) return;
+
+            items.Remove(item);
+        }
     }
 
     
