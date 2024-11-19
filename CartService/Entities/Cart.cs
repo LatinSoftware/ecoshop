@@ -17,7 +17,11 @@ namespace CartService.Entities
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
 
-        public IReadOnlyCollection<CartItem> Items => items.ToList();
+        public List<CartItem> Items
+        {
+            get => items;
+            private set => items = value ?? [];
+        }
 
         public static Cart Create(Guid UserId)
         {
