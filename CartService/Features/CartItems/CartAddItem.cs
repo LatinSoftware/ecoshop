@@ -5,6 +5,7 @@ using CartService.Models;
 using FluentResults;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CartService.Features.CartItems
 {
@@ -44,7 +45,7 @@ namespace CartService.Features.CartItems
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapPost("cart/{id:string}/items", async (string id, CartItemRequest items, ISender sender) =>
+                app.MapPost("cart/{id}/items", async (string id, [FromBody]CartItemRequest items, ISender sender) =>
                 {
                     var result = await sender.Send(new Command(id, items));
                     if (result.IsFailed) return Results.NotFound(result.Errors);
