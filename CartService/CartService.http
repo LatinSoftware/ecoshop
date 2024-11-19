@@ -1,13 +1,50 @@
 @CartService_HostAddress = http://localhost:5174/api/v1
 
+
+GET {{CartService_HostAddress}}/cart
+Accept: application/json
+
+###
+
+GET {{CartService_HostAddress}}/cart/c844b543-f864-4663-a13b-ce8fd9ea3a8e
+Accept: application/json
+
+###
+
 POST {{CartService_HostAddress}}/cart
 Content-Type: application/json
 
 {
   "userId": "c844b543-f864-4663-a13b-ce8fd9ea3a8e",
-  "items": []
+  "items": [
+    {
+      "ProductId": "c844b543-f864-4663-a13b-ce8fd9ea3a8e",
+      "Quantity": 10,
+      "Price": 10.50
+    }
+  ]
 }
 
 ###
 
+POST {{CartService_HostAddress}}/cart/673cefd43f547d1c4f02f605/items
+Content-Type: application/json
+
+{
+  "ProductId": "c844b543-f864-4663-a13b-ce8fd9ea3a8e",
+  "Quantity": 10,
+  "Price": 10.50
+}
+
+###
+
+PATCH {{CartService_HostAddress}}/cart/673cefd43f547d1c4f02f605/items/b92ac79a-3b5d-4704-8caa-7f6f82525334/10
+Content-Type: application/json
+
+{}
+###
+
+DELETE {{CartService_HostAddress}}/cart/673cefd43f547d1c4f02f605/items/b92ac79a-3b5d-4704-8caa-7f6f82525334
+Accept: application/json
+###
 
