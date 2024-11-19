@@ -4,14 +4,12 @@ using CartService.Errors;
 using FluentResults;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CartService.Features.CartItems
 {
     public class CartItemUpdateQuantity
     {
         public record Command(string CartId, string ItemId, int Quantity) : ICommand;
-        public sealed class QuantityRequest { public int Quantity { get; set; } }
         public sealed class Handler(ICartRepository repository) : ICommandHandler<Command>
         {
             public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
@@ -23,7 +21,7 @@ namespace CartService.Features.CartItems
                 if (item == null)
                     return Result.Fail(ItemErrorMessage.NotFound(request.ItemId));
 
-                item.SetQuantity(item.Quantity);
+                item.SetQuantity(request.Quantity);
 
                 await repository.UpdateAsync(cart.Value.Id!, cart.Value);
                 return Result.Ok();
@@ -43,15 +41,15 @@ namespace CartService.Features.CartItems
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapPatch("cart/{cartId:string}/items/{itemId:string}", async (
+                app.MapPatch("cart/{cartId}/items/{itemId}/{quantity}", async (
                     string cartId,
                     string itemId,
-                    [FromBody] QuantityRequest request,
+                    int quantity,
                     ISender sender
                     ) =>
                 {
 
-                    var result = await sender.Send(new Command(cartId, itemId, request.Quantity));
+                    var result = await sender.Send(new Command(cartId, itemId, quantity));
 
                     if (result.IsFailed) return Results.NotFound(result.Errors);
 
