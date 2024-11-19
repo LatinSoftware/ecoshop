@@ -12,12 +12,17 @@ namespace CartService.Database.Repositories
         private readonly IMongoCollection<Cart> _collection = mongoDatabase.GetCollection<Cart>(nameof(Cart));
 
         public async Task<List<Cart>> GetAsync(Expression<Func<Cart, bool>> filter) => await _collection.Find(filter).ToListAsync();
-        public async Task<Cart?> GetAsync(string id) => await _collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+        public async Task<Result<Cart>> GetAsync(string id)
+        {
+            var cart = await _collection.Find(x => x.Id == id).FirstOrDefaultAsync();
+            if (cart == null) return Result.Fail(CartErrorMessage.NotFound(id));
+            return Result.Ok(cart);
+        }
         public async Task<Result<Cart>> GetByUserId(Guid id)
         {
             var entity = await _collection.Find(x => x.UserId == id).FirstOrDefaultAsync();
             if (entity == null)
-                return Result.Fail(CartErrorMessage.NotFound(id));
+                return Result.Fail(CartErrorMessage.NotFoundForUser(id));
             return Result.Ok(entity);
         }
         public async Task CreateAsync(Cart newCart) => await _collection.InsertOneAsync(newCart);
