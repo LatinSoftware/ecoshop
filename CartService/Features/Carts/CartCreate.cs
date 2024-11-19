@@ -1,12 +1,13 @@
 ﻿using CartService.Abstractions;
 using CartService.Abstractions.Repositories;
 using CartService.Entities;
+using CartService.Features.CartItems;
 using CartService.Models;
 using FluentResults;
 using FluentValidation;
 using MediatR;
 
-namespace CartService.Features.Cart
+namespace CartService.Features.Carts
 {
     public partial class CartCreate
     {

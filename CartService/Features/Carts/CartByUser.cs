@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using CartService.Abstractions;
 using CartService.Abstractions.Repositories;
-using CartService.Entities;
 using CartService.Models;
 using FluentResults;
 using MediatR;
 
-namespace CartService.Features.Cart
+namespace CartService.Features.Carts
 {
-    public class CartByUser
+    public partial class CartByUser
     {
         public record Query(Guid UserId) : IQuery<CartModel>;
         public sealed class Handler(ICartRepository repository, IMapper mapper) : IQueryHandler<Query, CartModel>
@@ -23,15 +22,6 @@ namespace CartService.Features.Cart
 
                 return model;
 
-            }
-        }
-
-        public sealed class Mapping : Profile
-        {
-            public Mapping()
-            {
-                CreateMap<Cart, CartModel>();
-                CreateMap<CartItem, CartItemResponse>();
             }
         }
 
