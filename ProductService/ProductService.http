@@ -1,4 +1,4 @@
-@ProductService_HostAddress = http://localhost:5237/api/v1
+@ProductService_HostAddress = https://localhost:8082/api/v1
 
 // CATEGORIES REQUEST
 GET {{ProductService_HostAddress}}/categories
@@ -57,7 +57,7 @@ Accept: application/json
 }
 ###
 
-DELETE {{ProductService_HostAddress}}/products/4177ff9e-77b8-40c4-9706-9d8533a6bead
+DELETE {{ProductService_HostAddress}}/products/c844b543-f864-4663-a13b-ce8fd9ea3a8e
 Accept: application/json
 ###
 
@@ -77,6 +77,6 @@ GET {{ProductService_HostAddress}}/products?minprice=50&maxprice=1000
 Accept: application/json
 ###
 
-GET {{ProductService_HostAddress}}/products/2227c154-63f8-41b9-ad60-48dd20c8e81c
+GET {{ProductService_HostAddress}}/products/de3a56bd-30df-4aed-80d8-51878a9e25a6
 Accept: application/json
 ###

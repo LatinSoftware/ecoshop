@@ -16,6 +16,10 @@
         public static CartItem Create(string CartId, Guid ProductId, int Quantity, decimal Price, decimal total)
         => new() { Id = Guid.NewGuid().ToString(), CartId = CartId, ProductId = ProductId, Quantity = Quantity, Price = Price, Total =  total};
 
-        public void SetQuantity(int quantity) => Quantity = quantity;
+        public void SetQuantity(int quantity)
+        {
+            Quantity = quantity;
+            Total = Price * Quantity;
+        }
     }
 }

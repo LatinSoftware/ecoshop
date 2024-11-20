@@ -5,6 +5,8 @@ namespace CartService.Entities
 {
     public class Cart
     {
+        private decimal total;
+
         private List<CartItem> items { get; set; } = [];
 
         private Cart() { }
@@ -13,7 +15,7 @@ namespace CartService.Entities
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; private set; }
         public Guid? UserId { get; private set; }
-        public decimal Total { get; private set; }
+        public decimal Total { get => items.Sum(x => x.Total); private set => total = value; }
         public DateTime CreatedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }
 
