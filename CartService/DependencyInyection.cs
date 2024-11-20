@@ -10,6 +10,8 @@ using MongoDB.Bson.Serialization;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Reflection;
+using CartService.Abstractions.Services;
+using CartService.Services;
 
 namespace CartService
 {
@@ -30,14 +32,18 @@ namespace CartService
             });
 
             services.AddAutoMapper(typeof(Program).Assembly);
-
             services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
+            services.AddHttpClient<IProductService, ProductService>("product", client =>
+            {
+                client.DefaultRequestHeaders.Add("User-Agent", "CartService");
+                client.BaseAddress = new Uri("https://localhost:8082/api/v1/products/");
+            });
             
 
-            services.AddSingleton<ICartRepository, CartRepository>();
+            services.AddScoped<ICartRepository, CartRepository>();
+            services.AddScoped<IProductService, ProductService>();
 
-           
 
             return services;
         }
