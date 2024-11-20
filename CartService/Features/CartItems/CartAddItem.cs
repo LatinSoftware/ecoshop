@@ -1,5 +1,6 @@
 ﻿using CartService.Abstractions;
 using CartService.Abstractions.Repositories;
+using CartService.Abstractions.Services;
 using CartService.Entities;
 using CartService.Models;
 using FluentResults;
@@ -12,7 +13,7 @@ namespace CartService.Features.CartItems
     public class CartAddItem
     {
         public record Command(string CartId, CartItemRequest Item) : ICommand;
-        public sealed class Handler(ICartRepository cartRepository) : ICommandHandler<Command>
+        public sealed class Handler(ICartRepository cartRepository, IProductService productService) : ICommandHandler<Command>
         {
             public async Task<Result> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -22,11 +23,28 @@ namespace CartService.Features.CartItems
 
                 var cart = result.Value;
 
-                var item = request.Item;
-                var cartItem = CartItem.Create(cart.Id!, item.ProductId, item.Quantity, item.Price, item.Quantity * item.Price);
-                cart.AddItem(cartItem);
-                await cartRepository.UpdateAsync(request.CartId, cart);
+               
 
+                if (!cart.Items.Any(x => x.ProductId == request.Item.ProductId))
+                {
+                    var product = await productService.GetAsync(request.Item.ProductId);
+                    if (product.IsFailed) return Result.Fail(product.Errors);
+
+                    var item = request.Item;
+                    var price = product.Value.Price;
+                    var cartItem = CartItem.Create(cart.Id!, item.ProductId, item.Quantity, price, item.Quantity * price);
+                    cart.AddItem(cartItem);
+                   
+                }
+                else
+                {
+                    var itemToUpdate = cart.Items.First(x => x.ProductId == request.Item.ProductId);
+                    itemToUpdate.SetQuantity(itemToUpdate.Quantity + request.Item.Quantity);
+                    
+                }
+
+
+                await cartRepository.UpdateAsync(request.CartId, cart);
                 return Result.Ok();
 
             }

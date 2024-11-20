@@ -1,5 +1,6 @@
 ﻿using CartService.Abstractions;
 using CartService.Abstractions.Repositories;
+using CartService.Abstractions.Services;
 using CartService.Entities;
 using CartService.Features.CartItems;
 using CartService.Models;
@@ -12,7 +13,7 @@ namespace CartService.Features.Carts
     public partial class CartCreate
     {
         public record Command(Guid UserId, List<CartItemRequest> Items) : ICommand<Cart>;
-        public sealed class Handler(ICartRepository repository) : ICommandHandler<Command, Cart>
+        public sealed class Handler(ICartRepository repository, IProductService productService) : ICommandHandler<Command, Cart>
         {
             public async Task<Result<Cart>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -22,8 +23,16 @@ namespace CartService.Features.Carts
 
                 var userCart = Cart.Create(request.UserId);
 
-                request.Items.ForEach(item => userCart.AddItem(
-                    CartItem.Create(userCart.Id!, item.ProductId, item.Quantity, item.Price, item.Price * item.Quantity)));
+                request.Items.ForEach(async item =>
+                {
+                    var productResult = await productService.GetAsync(item.ProductId);
+
+                    if (productResult.IsFailed) return;
+
+                    var price = productResult.Value.Price;
+
+                    userCart.AddItem(CartItem.Create(userCart.Id!, item.ProductId, item.Quantity, price, price * item.Quantity));
+                });
 
 
                 await repository.CreateAsync(userCart);
