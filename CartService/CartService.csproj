@@ -5,8 +5,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>true</InvariantGlobalization>
+	  
   </PropertyGroup>
-
+	
   <ItemGroup>
 	  <PackageReference Include="Asp.Versioning.Http" Version="8.1.0" />
 	<PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
@@ -19,6 +20,8 @@
 	  <PackageReference Include="FluentValidation" Version="11.10.0" />
 	  <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
       <PackageReference Include="MediatR" Version="12.4.1" />
+	  <InternalsVisibleTo Include="CartService.Test" />
+	  
   </ItemGroup>
 
 </Project>
