@@ -4,7 +4,7 @@ using FluentAssertions;
 
 namespace CartService.Test.CartTest
 {
-    public class CartCreateTest(IntegrationTestWebAppFactory factory) : BaseIntregationTest(factory)
+    public class CartCreateTest(IntegrationTestWebAppFactory factory) : BaseIntegrationTest(factory)
     {
         [Fact]
         public async Task CartCreate_ShouldCreateEmptyCart_WhenCreatedWithoutItems()

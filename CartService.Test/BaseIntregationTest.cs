@@ -4,12 +4,12 @@ using MongoDB.Driver;
 
 namespace CartService.Test
 {
-    public abstract class BaseIntregationTest : IClassFixture<IntegrationTestWebAppFactory>, IDisposable
+    public abstract class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppFactory>, IDisposable
     {
         private readonly IServiceScope scope;
         protected readonly ISender Sender;
         protected readonly IMongoDatabase Database;
-        protected BaseIntregationTest(IntegrationTestWebAppFactory factory)
+        protected BaseIntegrationTest(IntegrationTestWebAppFactory factory)
         {
            
             scope = factory.Services.CreateScope();
