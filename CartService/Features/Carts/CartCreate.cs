@@ -17,13 +17,23 @@ namespace CartService.Features.Carts
         {
             public async Task<Result<Cart>> Handle(Command request, CancellationToken cancellationToken)
             {
-                //var result = await repository.GetByUserId(request.UserId);
+                var result = await repository.GetByUserId(request.UserId);
 
-                //if(result.IsFailed) return result;
+                if(result.IsSuccess){
+                    var cart = result.Value;
+                    cart = AddItems(cart, request.Items);
+                    await repository.UpdateAsync(cart.Id!, cart);
+                    return Result.Ok(cart);
+                }
 
-                var userCart = Cart.Create(request.UserId);
+                var userCart = AddItems(Cart.Create(request.UserId), request.Items);
+                await repository.CreateAsync(userCart);
+                return Result.Ok(userCart);
 
-                request.Items.ForEach(async item =>
+            }
+
+            private Cart AddItems(Cart cart, List<CartItemRequest> items){
+                items.ForEach(async item =>
                 {
                     var productResult = await productService.GetAsync(item.ProductId);
 
@@ -31,14 +41,10 @@ namespace CartService.Features.Carts
 
                     var price = productResult.Value.Price;
 
-                    userCart.AddItem(CartItem.Create(userCart.Id!, item.ProductId, item.Quantity, price, price * item.Quantity));
+                    cart.AddItem(CartItem.Create(cart.Id!, item.ProductId, item.Quantity, price, price * item.Quantity));
                 });
 
-
-                await repository.CreateAsync(userCart);
-
-                return Result.Ok(userCart);
-
+                return cart;
             }
         }
 

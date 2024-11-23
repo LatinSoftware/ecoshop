@@ -35,6 +35,12 @@ namespace CartService.Test
                 services.AddScoped<ICartRepository, CartRepository>();
                 services.AddScoped<IProductService, ProductMockService>();
                 services.AddMediatR(options =>
+            {
+                options.RegisterServicesFromAssembly(typeof(Program).Assembly);
+                options.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            });
+            
+                services.AddMediatR(options =>
                 {
                     options.RegisterServicesFromAssembly(typeof(DependencyInyection).Assembly);
                     options.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
