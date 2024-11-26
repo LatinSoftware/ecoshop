@@ -10,7 +10,7 @@ namespace CartService.Features.CartItems
         {
             RuleFor(c => c.ProductId).NotNull().NotEmpty();
             RuleFor(c => c.Quantity).NotNull().GreaterThan(0);
-            RuleFor(c => c.Price).NotNull().GreaterThanOrEqualTo(0).PrecisionScale(10, 2, false);
+
         }
     }
 
