@@ -61,7 +61,7 @@ namespace CartService.Features.Carts
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapPost("cart", async (Command command, ISender sender) =>
+                app.MapPost("cart", async (Command command, ISender sender, ClaimsPrincipal user) =>
                 {
                     var result = await sender.Send(command);
 
@@ -69,7 +69,7 @@ namespace CartService.Features.Carts
                         return Results.BadRequest(result.Value);
 
                     return Results.CreatedAtRoute("userCart", new { userId = command.UserId }, result.Value);
-                });
+                }).RequireAuthorization();
             }
         }
     }

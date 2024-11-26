@@ -38,7 +38,9 @@ namespace CartService.Features.Carts
                     return Results.Ok(result.Value);
                 })
                     .WithName("userCart")
-                .WithGroupName("Cart");
+                .WithGroupName("Cart")
+                .RequireAuthorization();
+                ;
             }
         }
     }

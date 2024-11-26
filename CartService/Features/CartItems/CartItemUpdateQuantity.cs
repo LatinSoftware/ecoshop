@@ -55,7 +55,7 @@ namespace CartService.Features.CartItems
 
                     return Results.NoContent();
 
-                });
+                }).RequireAuthorization();
             }
         }
     }

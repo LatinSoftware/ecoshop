@@ -2,14 +2,32 @@ using Asp.Versioning.Builder;
 using Asp.Versioning;
 using CartService;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<JsonOptions>(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
+
 // Add services to the container.
 builder.Services.AddServices(builder.Configuration);
 
-builder.Services.Configure<JsonOptions>(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(o =>
+    {
+        o.RequireHttpsMetadata = false;
+        o.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)),
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization();
 
 builder.Services.AddEndpoints(typeof(Program).Assembly);
 builder.Services.AddApiVersioning().AddApiExplorer();
@@ -37,5 +55,8 @@ RouteGroupBuilder versionedGroup = app
     .WithApiVersionSet(apiVersionSet);
 
 app.MapEndpoints(versionedGroup);
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();

@@ -32,7 +32,7 @@ namespace CartService.Features.Carts
 
                     return Results.Ok(result.Value);
 
-                }).WithGroupName("Cart");
+                }).WithGroupName("Cart").RequireAuthorization();
             }
         }
     }
