@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Testcontainers.MongoDb;
 
@@ -48,6 +50,8 @@ namespace CartService.Test
 
                 services.AddAutoMapper(typeof(DependencyInyection).Assembly);
                 services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+                
 
             });
         }
