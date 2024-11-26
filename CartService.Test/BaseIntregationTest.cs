@@ -22,7 +22,7 @@ namespace CartService.Test
         public void Dispose()
         {
             scope?.Dispose();
-            Database?.Client?.Dispose();
+           
         }
     }
 }
