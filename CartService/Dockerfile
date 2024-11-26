@@ -5,7 +5,7 @@ USER app
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG configuration=Release
 WORKDIR /src
-COPY ["CartService/CartService.csproj", "CartService/"]
+COPY ["./CartService.csproj", "CartService/"]
 RUN dotnet restore "CartService/CartService.csproj"
 COPY . .
 WORKDIR "/src/CartService"
