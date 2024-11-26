@@ -2,11 +2,14 @@
 using CartService.Abstractions.Repositories;
 using CartService.Abstractions.Services;
 using CartService.Entities;
+using CartService.Errors;
 using CartService.Features.CartItems;
 using CartService.Models;
 using FluentResults;
 using FluentValidation;
 using MediatR;
+using System.Net.Http.Headers;
+using System.Security.Claims;
 
 namespace CartService.Features.Carts
 {
@@ -63,6 +66,12 @@ namespace CartService.Features.Carts
             {
                 app.MapPost("cart", async (Command command, ISender sender, ClaimsPrincipal user) =>
                 {
+
+                    var userId = Guid.Parse(user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);
+
+                    if (command.UserId != userId)
+                        return Results.BadRequest(new Result().WithError(CartErrorMessage.UserMisMatch));
+
                     var result = await sender.Send(command);
 
                     if (result.IsFailed)
