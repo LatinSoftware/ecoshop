@@ -14,6 +14,7 @@ namespace CartService.Entities
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; private set; }
+        [BsonRepresentation(BsonType.String)]
         public Guid? UserId { get; private set; }
         public decimal Total { get => items.Sum(x => x.Total); private set => total = value; }
         public DateTime CreatedAt { get; private set; }

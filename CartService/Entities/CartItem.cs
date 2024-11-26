@@ -1,10 +1,14 @@
-﻿namespace CartService.Entities
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+
+namespace CartService.Entities
 {
     public class CartItem
     {
         private CartItem() { }
         public string? Id { get; private set; } = string.Empty;
         public string? CartId { get; private set; }
+        [BsonRepresentation(BsonType.String)]
         public Guid? ProductId { get; private set; }
         public int Quantity { get; private set; }
         public decimal Price { get; private set; }
