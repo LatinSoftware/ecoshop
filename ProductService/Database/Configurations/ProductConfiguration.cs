@@ -15,6 +15,9 @@ namespace ProductService.Database.Configurations
             builder.Property(x => x.Price).IsRequired().HasPrecision(10,2);
             builder.Property(x => x.Description).HasMaxLength(1500);
 
+            builder.Property(x => x.StockQuantity).IsRequired().HasConversion(qty => qty.Value, comparer => new StockQuantity(comparer));
+            builder.Property(x => x.ReservedQuantity).IsRequired().HasConversion(qty => qty.Value, comparer => new ReservedQuantity(comparer));
+
             builder.HasOne(x => x.Category).WithMany(x => x.Products)
                 .HasForeignKey(x => x.CategoryId)
                 .IsRequired();
