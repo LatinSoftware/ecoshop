@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ProductService.Abstractions;
 using ProductService.Entities;
-using ProductService.Extensions;
+using ProductService.Exceptions;
 
 namespace ProductService.Features.Categories.Update
 {

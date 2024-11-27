@@ -4,7 +4,7 @@ using MediatR;
 using ProductService.Abstractions;
 using ProductService.Database;
 using ProductService.Entities;
-using ProductService.Extensions;
+using ProductService.Exceptions;
 using ProductService.Features.Products;
 using System.Text.Json.Serialization;
 

@@ -1,7 +1,7 @@
 ﻿using FluentResults;
 using FluentValidation;
 using MediatR;
-using ProductService.Extensions;
+using ProductService.Exceptions;
 
 namespace ProductService.Behaviors
 {

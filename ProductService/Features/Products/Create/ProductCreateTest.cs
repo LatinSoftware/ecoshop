@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using FluentValidation.TestHelper;
 using ProductService.Entities;
-using ProductService.Extensions;
+using ProductService.Exceptions;
 using ProductService.Features.Categories;
 using Xunit;
 

@@ -4,7 +4,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProductService.Database;
 using ProductService.Entities;
-using ProductService.Extensions;
+using ProductService.Exceptions;
 using ProductService.Models;
 
 namespace ProductService.Features.Categories.Create

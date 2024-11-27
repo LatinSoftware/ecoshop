@@ -1,5 +1,5 @@
 ﻿using ProductService.Entities;
-using ProductService.Extensions;
+using ProductService.Exceptions;
 
 namespace ProductService.Features.Products
 {
