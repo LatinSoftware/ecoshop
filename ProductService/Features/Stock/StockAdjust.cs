@@ -5,6 +5,7 @@ using MediatR;
 using ProductService.Abstractions;
 using ProductService.Database;
 using ProductService.Entities;
+using ProductService.Extensions;
 using ProductService.Features.Products;
 using ProductService.Models;
 using System.Text.Json.Serialization;
@@ -58,9 +59,11 @@ namespace ProductService.Features.Stock
                 {
                     command.Id = productId;
                     var result = await sender.Send(command);
-                    if (result.IsFailed) return Results.NotFound(result.Errors);
 
-                    return Results.Ok(result.Value);
+                    return result.Match(
+                        onSuccess: () => Results.Ok(result.ToApiResponse()),
+                        onError: (_) => Results.Ok(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound))
+                        );
                 });
             }
         }

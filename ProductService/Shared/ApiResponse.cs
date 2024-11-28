@@ -20,8 +20,7 @@
 
     public class ApiError
     {
-        public int Code { get; set; }
-        public string Message { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
         public string Detail { get; set; } = string.Empty;
     }
 

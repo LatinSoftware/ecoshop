@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using ProductService.Abstractions;
 using ProductService.Entities;
+using ProductService.Extensions;
 
 namespace ProductService.Features.Categories.GetById
 {
@@ -11,10 +12,12 @@ namespace ProductService.Features.Categories.GetById
             app.MapGet("categories/{id:guid}", async (Guid id, ISender sender) =>
             {
                 var result = await sender.Send(new CategoryGetByIdCommand(new CategoryId(id)));
-                if (result.IsSuccess)
-                    return Results.Ok(result.Value);
 
-                return Results.NotFound(result.Errors);
+                return result.Match
+                (
+                    onSuccess: () => Results.Ok(result.ToApiResponse(200)),
+                    onError: (_) => Results.NotFound(result.ToApiResponse(errorCode: 404))
+                );
             });
         }
     }

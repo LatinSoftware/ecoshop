@@ -4,7 +4,7 @@ using MediatR;
 using ProductService.Abstractions;
 using ProductService.Database;
 using ProductService.Entities;
-using ProductService.Exceptions;
+using ProductService.Extensions;
 using ProductService.Features.Products;
 using System.Text.Json.Serialization;
 
@@ -58,13 +58,17 @@ namespace ProductService.Features.Stock
                     command.ProductId = productId;
                     var result = await sender.Send(command);
 
-                    return result switch
-                    {
-                        { IsSuccess: true } => Results.NoContent(),
-                        { IsFailed: true, Errors: var errors }
-                        when result.HasError<ApplicationError>(e => e.Code == ProductErrors.NotFound(new ProductId(productId)).Code) => Results.NotFound(errors),
-                        _ => Results.BadRequest(result.Errors),
-                    } ;
+                    return result.Match
+                    (
+                        onSuccess: () => Results.NoContent(),
+                        onError: (errors) =>
+                        {
+                            if (errors.HasErrorWithCode(ProductErrors.NotFoundContent.Code))
+                                return Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound));
+
+                            return Results.Conflict(result.ToApiResponse(errorCode: StatusCodes.Status409Conflict));
+                        }
+                    );
                 });
             }
         }

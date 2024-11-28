@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using ProductService.Abstractions;
+using ProductService.Extensions;
 
 namespace ProductService.Features.Categories.Create
 {
@@ -11,10 +12,9 @@ namespace ProductService.Features.Categories.Create
             {
                 var result = await sender.Send(command);
 
-                if (result.IsFailed)
-                    return Results.BadRequest(result.Errors);
-
-                return Results.Created($"categories/{result.Value.Id}",result.Value);
+                return result.Match(
+                    onSuccess: () => Results.Created($"categories/{result.Value.Id}", result.ToApiResponse(StatusCodes.Status201Created)), 
+                    onError: (error) => Results.BadRequest(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound)));
             });
         }
     }

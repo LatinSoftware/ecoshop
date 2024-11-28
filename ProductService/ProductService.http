@@ -6,7 +6,7 @@ Accept: application/json
 
 ###
 
-GET {{ProductService_HostAddress}}/categories/3011778b-0296-466f-9b41-affb947683d1
+GET {{ProductService_HostAddress}}/categories/4af533b7-12fc-4803-a703-7d1485653358
 Accept: application/json
 ###
 
