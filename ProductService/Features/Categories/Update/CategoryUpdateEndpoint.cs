@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProductService.Abstractions;
 using ProductService.Entities;
 using ProductService.Extensions;
+using ProductService.Shared;
 
 namespace ProductService.Features.Categories.Update
 {
@@ -30,7 +31,7 @@ namespace ProductService.Features.Categories.Update
                         return Results.BadRequest(result.ToApiResponse(errorCode: StatusCodes.Status400BadRequest));
                     }
                 );
-            });
+            }).RequireAuthorization(Constants.AdminRole); ;
         }
     }
 }

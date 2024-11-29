@@ -69,7 +69,7 @@ namespace ProductService.Features.Stock
                             return Results.Conflict(result.ToApiResponse(errorCode: StatusCodes.Status409Conflict));
                         }
                     );
-                });
+                }).RequireAuthorization();
             }
         }
     }

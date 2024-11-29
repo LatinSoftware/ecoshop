@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using ProductService.Abstractions;
 using ProductService.Extensions;
+using ProductService.Shared;
 
 namespace ProductService.Features.Products.Update
 {
@@ -20,7 +21,7 @@ namespace ProductService.Features.Products.Update
                     );
 
                 return response;
-            });
+            }).RequireAuthorization(Constants.AdminRole); ;
         }
     }
 }

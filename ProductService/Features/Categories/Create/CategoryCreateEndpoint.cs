@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using ProductService.Abstractions;
 using ProductService.Extensions;
+using ProductService.Shared;
 
 namespace ProductService.Features.Categories.Create
 {
@@ -15,7 +16,7 @@ namespace ProductService.Features.Categories.Create
                 return result.Match(
                     onSuccess: () => Results.Created($"categories/{result.Value.Id}", result.ToApiResponse(StatusCodes.Status201Created)), 
                     onError: (error) => Results.BadRequest(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound)));
-            });
+            }).RequireAuthorization(Constants.AdminRole); ;
         }
     }
 }

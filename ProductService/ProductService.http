@@ -1,5 +1,11 @@
 @ProductService_HostAddress = https://localhost:8082/api/v1
 
+GET https://localhost:8082/hello
+Accept: application/text
+
+###
+
+
 // CATEGORIES REQUEST
 GET {{ProductService_HostAddress}}/categories
 Accept: application/json
