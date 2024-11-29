@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Abstractions;
 using UserService.Database;
 using UserService.Entities;
+using UserService.Extensions;
 using UserService.Shared;
 
 namespace UserService.Features.Users
@@ -71,8 +72,8 @@ namespace UserService.Features.Users
                 {
                     command.Id = id;
                     var result = await sender.Send(command);
-                    return Results.Ok();
-                });
+                    return Results.Ok(result.ToApiResponse());
+                }).RequireAuthorization();
             }
         }
     }

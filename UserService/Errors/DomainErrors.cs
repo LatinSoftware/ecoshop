@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 
-namespace UserService.Exceptions
+namespace UserService.Errors
 {
     public class DomainError : Error
     {

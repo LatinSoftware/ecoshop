@@ -5,13 +5,14 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UserService;
 using UserService.Database;
+using UserService.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddServices(builder.Configuration);
 
-builder.Services.AddAuthorization();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
     {
@@ -24,6 +25,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(UConstants.PolicyName, o => o.RequireRole(UConstants.AdminRole));
 
 builder.Services.AddEndpoints(typeof(Program).Assembly);
 builder.Services.AddApiVersioning().AddApiExplorer();

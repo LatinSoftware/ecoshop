@@ -1,7 +1,6 @@
 using Bogus;
 using FluentAssertions;
 using UserService.Entities;
-using UserService.Exceptions;
 using UserService.Features.SignUp;
 using UserService.Shared;
 using FluentValidation.TestHelper;
