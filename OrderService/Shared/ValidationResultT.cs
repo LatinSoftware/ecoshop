@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using OrderService.Abstractions;
-using UserService.Errors;
+using OrderService.Errors;
 
 namespace OrderService.Shared
 {

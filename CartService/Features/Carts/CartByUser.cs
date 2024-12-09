@@ -29,7 +29,7 @@ namespace CartService.Features.Carts
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapGet("cart/{userId:guid}", async (Guid userId, ISender sender) =>
+                app.MapGet("carts/{userId:guid}", async (Guid userId, ISender sender) =>
                 {
                     var result = await sender.Send(new Query(userId));
 
@@ -39,7 +39,7 @@ namespace CartService.Features.Carts
                 })
                     .WithName("userCart")
                 .WithGroupName("Cart")
-                .RequireAuthorization();
+                //.RequireAuthorization();
                 ;
             }
         }

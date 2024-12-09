@@ -66,7 +66,7 @@ namespace OrderService.Entities
        
         private void RecalculateSubtotal()
         {
-            Subtotal = _items.Sum(item => item.Total);
+            Subtotal = _items.Sum(item => item.Total.Value);
             Taxes = Subtotal * 0.1m;
         }
 

@@ -34,7 +34,7 @@ namespace CartService.Features.CartItems
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapDelete("cart/{cartId}/items/{itemId}", async (string cartId, string itemId, ISender sender) =>
+                app.MapDelete("carts/{cartId}/items/{itemId}", async (string cartId, string itemId, ISender sender) =>
                 {
                     var result = await sender.Send(new Command(cartId, itemId));
                     if (result.IsFailed) return Results.NotFound(result.Errors);

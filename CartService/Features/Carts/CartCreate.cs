@@ -64,7 +64,7 @@ namespace CartService.Features.Carts
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapPost("cart", async (Command command, ISender sender, ClaimsPrincipal user) =>
+                app.MapPost("carts", async (Command command, ISender sender, ClaimsPrincipal user) =>
                 {
 
                     var userId = Guid.Parse(user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value);

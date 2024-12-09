@@ -1,8 +1,8 @@
-using Asp.Versioning.Builder;
 using Asp.Versioning;
+using Asp.Versioning.Builder;
 using CartService;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
@@ -15,15 +15,33 @@ builder.Services.Configure<JsonOptions>(options => options.JsonSerializerOptions
 builder.Services.AddServices(builder.Configuration);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(o =>
+    .AddJwtBearer(options =>
     {
-        o.RequireHttpsMetadata = false;
-        o.TokenValidationParameters = new TokenValidationParameters
+        var issuer = builder.Configuration.GetValue<string>("Jwt:Issuer");
+        var audience = builder.Configuration.GetSection("Jwt:Audience").Get<string[]>();
+        options.TokenValidationParameters = new TokenValidationParameters
         {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)),
-            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidIssuer = issuer,
+            ValidAudiences = audience,
             ClockSkew = TimeSpan.Zero
+        };
+        options.Events = new JwtBearerEvents
+        {
+            OnAuthenticationFailed = context =>
+            {
+                var exception = context.Exception;
+                var errorMessage = exception.Message;
+
+                // Loggear el error de autenticación
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                logger.LogError("Authentication failed: {0}", errorMessage);
+                return Task.CompletedTask;
+            }
         };
     });
 

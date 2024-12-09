@@ -29,7 +29,7 @@ namespace UserService.Providers
                 Expires = DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("Jwt:ExpirationInMinutes")),
                 SigningCredentials = credentials,
                 Issuer = configuration["Jwt:Issuer"],
-                Audience = configuration["Jwt:Audience"],               
+                Audience = "https://localhost:0",
             };
 
            

@@ -25,7 +25,7 @@ namespace CartService.Features.Carts
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapGet("cart", async (ISender sender) =>
+                app.MapGet("carts", async (ISender sender) =>
                 {
 
                     var result = await sender.Send(new Query());

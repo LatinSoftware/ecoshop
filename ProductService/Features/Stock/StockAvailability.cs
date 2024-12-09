@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentResults;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ProductService.Abstractions;
 using ProductService.Database;
 using ProductService.Entities;
@@ -20,10 +21,13 @@ namespace ProductService.Features.Stock
             public async Task<Result<ProductStockModel>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var productId = new ProductId(request.ProductId);
-                var productResult = await Result.Try(() => context.Products.FindAsync(productId), e => ProductErrors.NotFound(productId));
-                if (productResult.IsFailed) return Result.Fail(productResult.Errors);
+                
+                var product = await context.Products.FirstOrDefaultAsync(x => x.Id == productId);
 
-                var model = mapper.Map<ProductStockModel>(productResult.Value);
+                if (product == null)
+                    return Result.Fail(ProductErrors.NotFound(productId));
+
+                var model = mapper.Map<ProductStockModel>(product);
                 return Result.Ok(model);
               
             }
@@ -53,7 +57,7 @@ namespace ProductService.Features.Stock
                         onSuccess: () => Results.Ok(result.ToApiResponse()),
                         onError: (_) => Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound))
                     );
-                }).RequireAuthorization();
+                });
             }
         }
     }

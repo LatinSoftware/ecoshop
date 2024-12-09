@@ -1,4 +1,4 @@
-﻿using UserService.Errors;
+﻿using OrderService.Errors;
 
 namespace OrderService.Abstractions
 {
