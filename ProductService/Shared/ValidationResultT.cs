@@ -1,6 +1,6 @@
 ﻿using FluentResults;
 using ProductService.Abstractions;
-using ProductService.Extensions;
+using ProductService.Exceptions;
 
 namespace ProductService.Shared
 {

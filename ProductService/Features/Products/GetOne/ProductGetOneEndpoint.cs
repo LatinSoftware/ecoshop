@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using ProductService.Abstractions;
 using ProductService.Entities;
+using ProductService.Extensions;
 
 namespace ProductService.Features.Products.GetOne
 {
@@ -14,11 +15,11 @@ namespace ProductService.Features.Products.GetOne
 
                 return result switch
                 {
-                    { IsSuccess: true} => Results.Ok(result.Value),
-                    _ => Results.NotFound(result.Errors)
+                    { IsSuccess: true} => Results.Ok(result.ToApiResponse()),
+                    _ => Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound))
                 };
 
-            });
+            }).WithName("ProductById");
         }
     }
 }

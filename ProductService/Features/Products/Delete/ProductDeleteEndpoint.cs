@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using ProductService.Abstractions;
 using ProductService.Entities;
+using ProductService.Extensions;
+using ProductService.Shared;
 
 namespace ProductService.Features.Products.Delete
 {
@@ -15,10 +17,10 @@ namespace ProductService.Features.Products.Delete
 
                 return result switch
                 {
-                    { IsFailed: true } => Results.NotFound(result.Errors),
+                    { IsFailed: true } => Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound, message: "Could not delete!")),
                     _ => Results.NoContent()
                 };
-            });
+            }).RequireAuthorization(Constants.AdminRole); 
         }
     }
 }

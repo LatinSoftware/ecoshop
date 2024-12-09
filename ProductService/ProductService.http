@@ -1,12 +1,18 @@
 @ProductService_HostAddress = https://localhost:8082/api/v1
 
+GET https://localhost:8082/hello
+Accept: application/text
+
+###
+
+
 // CATEGORIES REQUEST
 GET {{ProductService_HostAddress}}/categories
 Accept: application/json
 
 ###
 
-GET {{ProductService_HostAddress}}/categories/3011778b-0296-466f-9b41-affb947683d1
+GET {{ProductService_HostAddress}}/categories/4af533b7-12fc-4803-a703-7d1485653358
 Accept: application/json
 ###
 
@@ -46,6 +52,7 @@ Accept: application/json
 
 ###
 
+// PRODUCTS REQUEST
 PUT {{ProductService_HostAddress}}/products/4177ff9e-77b8-40c4-9706-9d8533a6bead
 Content-Type: application/json
 Accept: application/json
@@ -79,4 +86,43 @@ Accept: application/json
 
 GET {{ProductService_HostAddress}}/products/de3a56bd-30df-4aed-80d8-51878a9e25a6
 Accept: application/json
+###
+
+
+// STOCK REQUEST
+
+GET {{ProductService_HostAddress}}/products/07e5a756-ca10-4cbe-8261-7147ab2ff001/availability
+Accept: application/json
+###
+
+POST {{ProductService_HostAddress}}/products/07e5a756-ca10-4cbe-8261-7147ab2ff001/adjust-stock
+Content-Type: application/json
+Accept: application/json
+
+{
+  "quantity": 50,
+  "reason": "Initial stock registration"
+}
+
+###
+
+POST {{ProductService_HostAddress}}/products/07e5a756-ca10-4cbe-8261-7147ab2ff001/reserve-stock
+Content-Type: application/json
+Accept: application/json
+
+{
+  "quantity": 10
+}
+
+###
+
+
+POST {{ProductService_HostAddress}}/products/07e5a756-ca10-4cbe-8261-7147ab2ff001/release-stock
+Content-Type: application/json
+Accept: application/json
+
+{
+  "quantity": 10
+}
+
 ###

@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using UserService.Abstractions;
 using UserService.Database;
+using UserService.Extensions;
 using UserService.Providers;
 using UserService.Shared;
 
@@ -49,10 +50,11 @@ namespace UserService.Features.SignIn
                 {
                     var result = await sender.Send(command);
 
+
                     return result switch
                     {
-                        { IsSuccess: true } => Results.Ok(result.Value),
-                        _ => Results.BadRequest(result.Errors),
+                        { IsSuccess: true } => Results.Ok(result.ToApiResponse(StatusCodes.Status200OK)),
+                        _ => Results.BadRequest(result.ToApiResponse(errorCode: StatusCodes.Status400BadRequest)),
                     };
                 });
             }

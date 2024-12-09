@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Abstractions;
 using UserService.Database;
 using UserService.Entities;
+using UserService.Extensions;
 using UserService.Shared;
 
 namespace UserService.Features.SignUp
@@ -75,13 +76,14 @@ namespace UserService.Features.SignUp
                 {
                     var result = await sender.Send(command);
 
-                    return result switch
-                    {
-                        { IsSuccess: true } => Results.Created(),
-                        { IsFailed: true, Errors: var error } when result.HasError(error => error.HasMetadata("code", value => (string)value == UserErrorMessage.EmailAlreadyExist.Code)) => Results.Conflict(error),
-                        _ => Results.BadRequest(result.Errors)
-
-                    };
+                    return result.Match(
+                        onSuccess: () => Results.Created(),
+                        onError: (error) =>
+                        {
+                            if (error.HasErrorWithCode(UserErrorMessage.EmailAlreadyExist.Code))
+                                return Results.Conflict(result.ToApiResponse(errorCode: StatusCodes.Status409Conflict));
+                            return Results.BadRequest(result.ToApiResponse(errorCode: StatusCodes.Status400BadRequest));
+                        });
                 });
             }
         }

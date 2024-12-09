@@ -41,7 +41,7 @@ namespace CartService.Features.CartItems
         {
             public void MapEndpoint(IEndpointRouteBuilder app)
             {
-                app.MapPatch("cart/{cartId}/items/{itemId}/{quantity}", async (
+                app.MapPatch("carts/{cartId}/items/{itemId}/{quantity}", async (
                     string cartId,
                     string itemId,
                     int quantity,
@@ -55,7 +55,7 @@ namespace CartService.Features.CartItems
 
                     return Results.NoContent();
 
-                });
+                }).RequireAuthorization();
             }
         }
     }

@@ -41,8 +41,8 @@ namespace CartService.Test.CartTest
             //arrange
             var userId = Guid.NewGuid();
             var items = new List<CartItemRequest>(){
-                new () { ProductId = Guid.NewGuid(), Price = 250m, Quantity = 2 },
-                new () { ProductId = Guid.NewGuid(), Price = 350.99m, Quantity = 2 },
+                new () { ProductId = Guid.NewGuid(), Quantity = 2 },
+                new () { ProductId = Guid.NewGuid(), Quantity = 2 },
             };
             var command = new CartCreate.Command(userId, items);
 
@@ -62,8 +62,8 @@ namespace CartService.Test.CartTest
             var userId = Guid.NewGuid();
             await CreateCart(userId);
             var items = new List<CartItemRequest>(){
-                new () { ProductId = Guid.NewGuid(), Price = 250m, Quantity = 2 },
-                new () { ProductId = Guid.NewGuid(), Price = 350.99m, Quantity = 2 },
+                new () { ProductId = Guid.NewGuid(), Quantity = 2 },
+                new () { ProductId = Guid.NewGuid(), Quantity = 2 },
             };
             var command = new CartCreate.Command(userId, items);
 
@@ -84,8 +84,8 @@ namespace CartService.Test.CartTest
             //arrange
             var userId = Guid.Empty;
             var items = new List<CartItemRequest>(){
-                new () { ProductId = Guid.NewGuid(), Price = 250m, Quantity = 2 },
-                new () { ProductId = Guid.NewGuid(), Price = 350.99m, Quantity = 2 },
+                new () { ProductId = Guid.NewGuid(), Quantity = 2 },
+                new () { ProductId = Guid.NewGuid(), Quantity = 2 },
             };
             var command = new CartCreate.Command(userId, items);
 

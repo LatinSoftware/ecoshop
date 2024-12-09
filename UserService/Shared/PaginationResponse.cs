@@ -1,29 +1,16 @@
-using System;
 using Microsoft.EntityFrameworkCore;
 
 namespace UserService.Shared;
 
-public class PaginationResponse<T>
+public sealed class PaginationResponse<T> : ApiResponse<IEnumerable<T>>
 {
-    public IEnumerable<T> Data { get; set; }
-    public int CurrentPage { get; set; }
-    public int TotalItems { get; set; }
-    public int PageSize { get; set; }
-    public int TotalPages => (int)Math.Ceiling(TotalItems / (double)PageSize);
-    public bool HasPreviousPage => CurrentPage > 1;
-    public bool HasNextPage => CurrentPage < TotalPages;
-    public string? NextPageUrl { get; set; } = string.Empty;
-    public string? PreviousPageUrl { get; set; } = string.Empty;
+    public PaginationMetadata Metadata { get; set; }
 
-    public PaginationResponse(IEnumerable<T> data, int currentPage, int totalItems, int pageSize, Func<int, string> generatePageUrl)
+    public PaginationResponse(IEnumerable<T> data, PaginationMetadata metadata)
     {
         Data = data;
-        CurrentPage = currentPage;
-        TotalItems = totalItems;
-        PageSize = pageSize;
+        Metadata = metadata;
 
-        NextPageUrl = HasNextPage ? generatePageUrl(CurrentPage + 1) : null;
-        PreviousPageUrl = HasPreviousPage ? generatePageUrl(CurrentPage - 1) : null;
     }
 
     public static async Task<PaginationResponse<T>> CreateAsync(IQueryable<T> query, int page, int pageSize, Func<int, string> generatePageUrl)
@@ -31,6 +18,13 @@ public class PaginationResponse<T>
         var totalCount = await query.CountAsync();
         var items = await query.Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
 
-        return new(items, page, totalCount, pageSize, generatePageUrl);
+        var metadata = new PaginationMetadata(
+            currentPage: page,
+            totalItems: totalCount,
+            pageSize: pageSize,
+            generatePageUrl: generatePageUrl
+        );
+
+        return new PaginationResponse<T>(items, metadata);
     }
 }

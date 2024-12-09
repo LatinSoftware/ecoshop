@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using ProductService.Abstractions;
-using ProductService.Entities;
+using ProductService.Extensions;
+using ProductService.Shared;
 
 namespace ProductService.Features.Products.Update
 {
@@ -13,13 +14,14 @@ namespace ProductService.Features.Products.Update
                 command.ProductId = id;
                 var result = await sender.Send(command);
 
-                return result switch
-                {
-                    { IsSuccess: true } => Results.NoContent(),
-                    { IsFailed: true, Errors: var errors } when errors.Contains(ProductErrors.NotFound(ProductId.Create(command.ProductId))) => Results.NotFound(result),
-                    _ => Results.BadRequest(result)
-                };
-            });
+               var response = result.Match(
+                    onSuccess: () => Results.NoContent(),
+                    onError: (_) => Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound, message: ProductErrors.NotFoundContent.Message))
+                    
+                    );
+
+                return response;
+            }).RequireAuthorization(Constants.AdminRole); ;
         }
     }
 }

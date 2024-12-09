@@ -1,6 +1,5 @@
 ﻿using UserService.Entities;
 using UserService.Errors;
-using UserService.Exceptions;
 
 namespace UserService.Shared
 {

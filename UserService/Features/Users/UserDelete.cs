@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using UserService.Abstractions;
 using UserService.Database;
 using UserService.Entities;
+using UserService.Extensions;
 using UserService.Shared;
 
 namespace UserService.Features.Users
@@ -35,10 +36,10 @@ namespace UserService.Features.Users
                     var result = await sender.Send(new Command(new UserId(id)));
 
                     if (result.IsFailed)
-                        return Results.NotFound();
+                        return Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound));
 
                     return Results.NoContent();
-                });
+                }).RequireAuthorization(UConstants.AdminRole);
             }
         }
     }

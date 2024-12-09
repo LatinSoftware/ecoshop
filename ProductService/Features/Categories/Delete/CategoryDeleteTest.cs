@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using ProductService.Entities;
-using ProductService.Extensions;
+using ProductService.Exceptions;
 using Xunit;
 
 namespace ProductService.Features.Categories.Delete

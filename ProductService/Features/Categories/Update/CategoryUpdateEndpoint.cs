@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProductService.Abstractions;
 using ProductService.Entities;
 using ProductService.Extensions;
+using ProductService.Shared;
 
 namespace ProductService.Features.Categories.Update
 {
@@ -15,17 +16,22 @@ namespace ProductService.Features.Categories.Update
                 command.CategoryId = new CategoryId(id);
                 var result = await sender.Send(command);
 
-                if (result.IsSuccess)
-                    return Results.NoContent();
+                return result.Match
+                (
+                    onSuccess: () => Results.NoContent(),
+                    onError: (errors) =>
+                    {
+                        var categoryError = CategoryErrors.NotFound(command.CategoryId);
+                        if (errors.HasErrorWithCode(categoryError.Code))
+                            return Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound));
 
-                if (result.HasError<ApplicationError>(error => error.Code == CategoryErrors.NotFound(command.CategoryId).Code))
-                {
-                    return Results.NotFound(result.Errors);
-                }
+                        if(errors.HasErrorWithCode(CategoryErrors.AlreadyExist.Code))
+                            return Results.Conflict(result.ToApiResponse(errorCode: StatusCodes.Status409Conflict));
 
-                return Results.BadRequest(result.Errors);
-
-            });
+                        return Results.BadRequest(result.ToApiResponse(errorCode: StatusCodes.Status400BadRequest));
+                    }
+                );
+            }).RequireAuthorization(Constants.AdminRole); ;
         }
     }
 }

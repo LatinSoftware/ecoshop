@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using ProductService.Abstractions;
+using ProductService.Extensions;
 
 namespace ProductService.Features.Products.Filter
 {
@@ -10,7 +11,7 @@ namespace ProductService.Features.Products.Filter
             app.MapGet("products", async ([AsParameters]ProductFilterQuery query, ISender sender) =>
             {
                 var result = await sender.Send(query);
-                return Results.Ok(result.Value);
+                return Results.Ok(result.ToApiResponse());
             });
         }
     }

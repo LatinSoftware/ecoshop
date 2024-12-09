@@ -4,6 +4,7 @@ using MediatR;
 using UserService.Abstractions;
 using UserService.Database;
 using UserService.Entities;
+using UserService.Extensions;
 using UserService.Models;
 using UserService.Shared;
 
@@ -88,8 +89,8 @@ public sealed class UserFilter
             app.MapGet("users", async ([AsParameters]Query query, ISender sender) =>
             {
                 var result = await sender.Send(query);
-                return Results.Ok(result.Value);
-            });
+                return Results.Ok(result.ToApiResponse());
+            }).RequireAuthorization(UConstants.AdminRole);
         }
     }
 }

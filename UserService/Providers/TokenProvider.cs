@@ -19,20 +19,25 @@ namespace UserService.Providers
                 Subject = new ClaimsIdentity
                 (
                     [
+                        new Claim(JwtRegisteredClaimNames.UniqueName, user.Email.Value),
                         new Claim(JwtRegisteredClaimNames.Sub, user.Id.Value.ToString()),
                         new Claim(JwtRegisteredClaimNames.Email, user.Email.Value),
                         new Claim(JwtRegisteredClaimNames.Name, user.Name),
-                        new Claim("Role", user.Role.ToString())
+                        new Claim(ClaimTypes.Role, user.Role.ToString().ToLower())
                     ]
                 ),
                 Expires = DateTime.UtcNow.AddMinutes(configuration.GetValue<int>("Jwt:ExpirationInMinutes")),
                 SigningCredentials = credentials,
                 Issuer = configuration["Jwt:Issuer"],
-                Audience = configuration["Jwt:Audience"]
+                Audience = "https://localhost:0",
             };
 
+           
+
             var handler = new JsonWebTokenHandler();
+            
             string token = handler.CreateToken(tokenDescriptor);
+            
             return token;
         }
     }

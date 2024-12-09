@@ -1,4 +1,4 @@
-﻿using ProductService.Extensions;
+﻿using ProductService.Exceptions;
 
 namespace ProductService.Abstractions
 {

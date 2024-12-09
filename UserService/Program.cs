@@ -5,25 +5,30 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using UserService;
 using UserService.Database;
+using UserService.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddServices(builder.Configuration);
 
-builder.Services.AddAuthorization();
+
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(o =>
     {
+        var audience = builder.Configuration.GetSection("Jwt:Audience").Get<string[]>();
         o.RequireHttpsMetadata = false;
         o.TokenValidationParameters = new TokenValidationParameters
         {
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"]!)),
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
-            ValidAudience = builder.Configuration["Jwt:Audience"],
+            ValidAudiences = audience,
             ClockSkew = TimeSpan.Zero
         };
     });
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(UConstants.PolicyName, o => o.RequireRole(UConstants.AdminRole));
 
 builder.Services.AddEndpoints(typeof(Program).Assembly);
 builder.Services.AddApiVersioning().AddApiExplorer();
@@ -32,6 +37,11 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.MapGet("test", () =>
+{
+    return Results.Ok("respuesta");
+}).RequireAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
