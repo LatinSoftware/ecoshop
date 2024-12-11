@@ -2,24 +2,37 @@
 using MassTransit;
 using MassTransit.Mediator;
 using OrderService.Abstractions;
+using OrderService.Contracts;
+using OrderService.Database;
 using OrderService.Entities;
-using OrderService.Errors;
 using OrderService.Models;
 
 namespace OrderService.Features.Orders
 {
     public sealed class OrderCreate
     {
-        public record Command : Request<Result<OrderCreatedModel>>
+        public record OrderCreatedResponse
+        {
+            public Guid Id { get;  set; }
+            public Guid UserId { get; set; }
+            public decimal Subtotal { get;  set; }
+            public decimal Taxes { get;  set; }
+            public decimal Total { get; set; }
+            public OrderStatus Status { get;  set; }
+            public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+        }
+        public record Command : Request<Result<OrderCreatedResponse>>
         {
             public string CartId { get; set; } = string.Empty;
             public Guid UserId { get; set; }
             public PaymentMethod PaymentMethod { get; set; }
         }
 
-        public sealed class Handler(ICartApi cartApi, IProductApi productApi) : MediatorRequestHandler<Command, Result<OrderCreatedModel>>
+       
+
+        public sealed class Handler(ICartApi cartApi, IProductApi productApi, ApplicationContext appContext, IBus bus) : MediatorRequestHandler<Command, Result<OrderCreatedResponse>>
         {
-            protected override async Task<Result<OrderCreatedModel>> Handle(Command request, CancellationToken cancellationToken)
+            protected override async Task<Result<OrderCreatedResponse>> Handle(Command request, CancellationToken cancellationToken)
             {
                 // get user cart
                 var cartResult = await cartApi.GetByUserId(request.UserId);
@@ -41,11 +54,39 @@ namespace OrderService.Features.Orders
 
                 // create payment authorization
 
-                // create order
 
-                return Result.Ok(new OrderCreatedModel
+
+                // create order
+                var order = new Order();
+
+                cartResult.Items.ToList().ForEach(item => 
                 {
-                    OrderId = Guid.NewGuid(),
+                    var orderItemResult = OrderItem.Create(order.Id, new ProductId(item.ProductId), new Quantity(item.Quantity), new Money(item.Price));
+
+                    if (orderItemResult.IsFailed)
+                        return;
+
+                    order.AddItem(orderItemResult.Value);
+                });
+
+                await appContext.Orders.AddAsync(order, cancellationToken);
+
+                await appContext.SaveChangesAsync(cancellationToken);
+
+                
+
+                await bus.Publish(new OrderCreated(order.Id.Value, request.UserId, order.Total, [.. order.Items]), cancellationToken);
+
+
+                return Result.Ok(new OrderCreatedResponse
+                {
+                    Id = order.Id.Value,
+                    UserId = request.UserId,
+                    Subtotal = order.Subtotal,
+                    Taxes = order.Taxes,
+                    Total = order.Total,
+                    Status = order.Status,
+                    Items = order.Items.ToList()
                 });
             }
 
@@ -82,7 +123,10 @@ namespace OrderService.Features.Orders
                 {
                     var result = await mediator.SendRequest(command);
 
-                    return result.Errors;
+                    if (result.IsSuccess)
+                        return Results.Ok(result.Value);
+
+                    return Results.Ok(result.Errors);
                 });
             }
         }
