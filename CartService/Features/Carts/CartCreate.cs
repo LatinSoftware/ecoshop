@@ -78,7 +78,7 @@ namespace CartService.Features.Carts
                         return Results.BadRequest(result.Value);
 
                     return Results.CreatedAtRoute("userCart", new { userId = command.UserId }, result.Value);
-                }).RequireAuthorization();
+                });
             }
         }
     }

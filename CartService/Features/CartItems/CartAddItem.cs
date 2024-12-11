@@ -68,8 +68,7 @@ namespace CartService.Features.CartItems
                     var result = await sender.Send(new Command(id, items));
                     if (result.IsFailed) return Results.NotFound(result.Errors);
                     return Results.Created();
-                })
-                    .RequireAuthorization(); 
+                }); 
             }
         }
     }

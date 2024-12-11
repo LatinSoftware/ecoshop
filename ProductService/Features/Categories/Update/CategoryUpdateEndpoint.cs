@@ -31,7 +31,7 @@ namespace ProductService.Features.Categories.Update
                         return Results.BadRequest(result.ToApiResponse(errorCode: StatusCodes.Status400BadRequest));
                     }
                 );
-            }).RequireAuthorization(Constants.AdminRole); ;
+            }) ;
         }
     }
 }

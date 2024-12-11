@@ -21,7 +21,7 @@ namespace ProductService.Features.Products.Update
                     );
 
                 return response;
-            }).RequireAuthorization(Constants.AdminRole); ;
+            });
         }
     }
 }

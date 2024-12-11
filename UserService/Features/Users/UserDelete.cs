@@ -39,7 +39,7 @@ namespace UserService.Features.Users
                         return Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound));
 
                     return Results.NoContent();
-                }).RequireAuthorization(UConstants.AdminRole);
+                });
             }
         }
     }

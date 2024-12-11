@@ -20,7 +20,7 @@ namespace ProductService.Features.Products.Delete
                     { IsFailed: true } => Results.NotFound(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound, message: "Could not delete!")),
                     _ => Results.NoContent()
                 };
-            }).RequireAuthorization(Constants.AdminRole); 
+            }); 
         }
     }
 }

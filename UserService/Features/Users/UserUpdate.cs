@@ -73,7 +73,7 @@ namespace UserService.Features.Users
                     command.Id = id;
                     var result = await sender.Send(command);
                     return Results.Ok(result.ToApiResponse());
-                }).RequireAuthorization();
+                });
             }
         }
     }

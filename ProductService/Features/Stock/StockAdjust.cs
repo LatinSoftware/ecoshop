@@ -65,7 +65,7 @@ namespace ProductService.Features.Stock
                         onSuccess: () => Results.Ok(result.ToApiResponse()),
                         onError: (_) => Results.Ok(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound))
                         );
-                }).RequireAuthorization(Constants.AdminRole);
+                });
             }
         }
     }

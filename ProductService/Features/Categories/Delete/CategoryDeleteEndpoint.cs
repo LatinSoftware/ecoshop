@@ -18,7 +18,7 @@ namespace ProductService.Features.Categories.Delete
 
                 return Results.NotFound(result.Errors);
                 
-            }).RequireAuthorization(Constants.AdminRole); ;
+            }) ;
         }
     }
 }

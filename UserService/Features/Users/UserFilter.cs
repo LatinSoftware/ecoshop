@@ -90,7 +90,7 @@ public sealed class UserFilter
             {
                 var result = await sender.Send(query);
                 return Results.Ok(result.ToApiResponse());
-            }).RequireAuthorization(UConstants.AdminRole);
+            });
         }
     }
 }
