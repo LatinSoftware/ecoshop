@@ -1,19 +1,18 @@
-﻿using MongoDB.Driver;
+﻿using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using OrderService.Entities;
 
 namespace OrderService.Database
 {
-    public class ApplicationContext
+    public class ApplicationContext(DbContextOptions options) : DbContext(options)
     {
-        private readonly IMongoDatabase database;
-        public ApplicationContext(string connectionString, string databaseName)
-        {
-            var client = new MongoClient(connectionString);
-            database = client.GetDatabase(databaseName);
-        }
+        public static ApplicationContext Create(IMongoDatabase database) => new(new DbContextOptionsBuilder<ApplicationContext>()
+            .UseMongoDB(database.Client, database.DatabaseNamespace.DatabaseName)
+            .Options);
 
-        public IMongoCollection<Order> Orders => database.GetCollection<Order>(nameof(Order).ToLowerInvariant());
-        public IMongoCollection<OrderItem> OrderItems => database.GetCollection<OrderItem>(nameof(OrderItem).ToLowerInvariant());
-        public IMongoCollection<PaymentInfo> PaymentInfos => database.GetCollection<PaymentInfo>(nameof(PaymentInfo).ToLowerInvariant());
+
+        public DbSet<Order> Orders { get; init; }
+        public DbSet<OrderItem> OrderItems { get; init; }
+        public DbSet<PaymentInfo> PaymentInfos { get; init; }
     }
 }

@@ -1,8 +1,11 @@
 ﻿using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MongoDB.Driver;
 using OrderService.Abstractions;
+using OrderService.Database;
 using OrderService.Features;
-using OrderService.Features.StateMachines;
+using OrderService.Features.Orders;
 using Refit;
 using System.Reflection;
 
@@ -12,11 +15,16 @@ namespace OrderService
     {
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
         {
+
+            var client = new MongoClient(configuration.GetConnectionString("Default"));
+            ApplicationContext.Create(client.GetDatabase("orders"));
+
+
             services.AddMediator(x => x.AddConsumersFromNamespaceContaining<Consumers>());
 
             services.AddMassTransit(x =>
             {
-                x.AddSagaStateMachine<OrderStateMachine, OrderState>().InMemoryRepository();
+                x.AddSagaStateMachine<OrderStateMachine, OrderStateMachineData>().InMemoryRepository();
             });
 
             services.AddRefitClient<ICartApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:8081/api/v1"));
