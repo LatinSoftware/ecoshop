@@ -32,6 +32,19 @@ services:
       - '27017:27017'
     volumes:
       - cartata:/etc/mongo
+  ecoshop-mq:
+    image: rabbitmq:3-management
+    container_name: ecoshop_mq
+    hostname: ecoshop-mq
+    volumes:
+        - ./.containers/queue/data/:/var/lib/rabbitmq
+        - ./.containers/queue/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
   # user_ms:
   #    build:
   #     context: ./UserService
