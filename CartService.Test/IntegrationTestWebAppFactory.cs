@@ -44,11 +44,11 @@ namespace CartService.Test
             
                 services.AddMediatR(options =>
                 {
-                    options.RegisterServicesFromAssembly(typeof(DependencyInyection).Assembly);
+                    options.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly);
                     options.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
                 });
 
-                services.AddAutoMapper(typeof(DependencyInyection).Assembly);
+                services.AddAutoMapper(typeof(DependencyInjection).Assembly);
                 services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
                 
