@@ -23,8 +23,6 @@ namespace CartService.Features.CartItems
 
                 var cart = result.Value;
 
-               
-
                 if (!cart.Items.Any(x => x.ProductId == request.Item.ProductId))
                 {
                     var product = await productService.GetAsync(request.Item.ProductId);

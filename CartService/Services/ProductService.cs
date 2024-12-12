@@ -1,5 +1,6 @@
 ﻿using CartService.Abstractions.Services;
 using CartService.Models;
+using CartService.Shared;
 using FluentResults;
 
 namespace CartService.Services
@@ -12,8 +13,8 @@ namespace CartService.Services
             try
             {
                 using var client = factory.CreateClient("product");
-                var response = await client.GetFromJsonAsync<ProductModel>($"{id}");
-                return Result.Ok(response!);
+                var response = await client.GetFromJsonAsync<ApiResponse<ProductModel>>($"{id}");
+                return Result.Ok(response?.Data!);
             }
             catch (Exception ex)
             {
