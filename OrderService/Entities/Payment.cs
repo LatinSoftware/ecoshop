@@ -3,24 +3,30 @@ using OrderService.Errors;
 
 namespace OrderService.Entities
 {
-    public class PaymentInfo
+    public class Payment
     {
-        public Guid Id { get; set;}
+
+        public Guid PaymentId { get; set; }
         public OrderId OrderId { get; set; } = new OrderId(Guid.Empty);
         public PaymentStatus Status { get; set; }
         public PaymentMethod Method { get; set; }
-        public string TransactionId { get; set; } = string.Empty;
+        public string? TransactionId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public virtual Order? Order { get; set; }
 
-        private PaymentInfo(OrderId orderId, PaymentMethod method, string transactionId)
+        private Payment()
         {
-            Id = Guid.NewGuid();
+
+        }
+        private Payment(OrderId orderId, PaymentMethod method, string transactionId)
+        {
+            PaymentId = Guid.NewGuid();
             OrderId = orderId;
             Method = method;
             TransactionId = transactionId;
         }
 
-        public static Result<PaymentInfo> Create(OrderId orderId, PaymentMethod method, string transactionId)
+        public static Result<Payment> Create(OrderId orderId, PaymentMethod method, string transactionId)
         {
             var result = Result.Merge(
                     Result.FailIf(orderId == null || orderId.Value == Guid.Empty, OrderErrorMessage.OrderIdNull),
@@ -29,7 +35,7 @@ namespace OrderService.Entities
 
             if (result.IsFailed) return result;
 
-            return Result.Ok(new PaymentInfo(orderId!, method, transactionId));
+            return Result.Ok(new Payment(orderId!, method, transactionId));
         }
 
         public Result MarkAsPaid()

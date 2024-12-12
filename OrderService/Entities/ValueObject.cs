@@ -5,6 +5,7 @@ namespace OrderService.Entities
 {
     public record OrderId(Guid Value);
     public record ProductId(Guid Value);
+    public record UserId(Guid Value);
     public record Money(decimal Value)
     {
         public static Result<Money> Create(decimal value)

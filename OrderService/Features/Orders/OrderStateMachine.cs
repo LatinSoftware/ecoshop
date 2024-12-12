@@ -1,5 +1,6 @@
 using MassTransit;
 using OrderService.Contracts;
+using OrderService.Entities;
 
 namespace OrderService.Features.Orders;
 
@@ -13,13 +14,12 @@ public class OrderStateMachine : MassTransitStateMachine<OrderStateMachineData>
     public State Failed { get; private set; }
     public State Cancelled { get; private set; }
 
-    public Event<OrderCreated> OrderSubmitted { get; private set; }
+    public Event<OrderCreated> OrderCreated { get; private set; }
     public Event<PaymentAuthorized> PaymentAuthorizedEvent { get; private set; }
     public Event<PaymentAuthorizationFailed> PaymentAuthorizationFailedEvent { get; private set; }
     public Event<OrderShipped> OrderShippedEvent { get; private set; }
     public Event<ShippingFailed> ShippingFailedEvent { get; private set; }
     public Event<OrderDelivered> OrderDeliveredEvent { get; private set; }
-    public Event<OrderCompleted> OrderCompletedEvent { get; private set; }
     public Event<OrderCancelled> OrderCancelledEvent { get; private set; }
 
 
@@ -27,7 +27,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderStateMachineData>
     {
         InstanceState(x => x.CurrentState);
 
-        Event(() => OrderSubmitted, x => x.CorrelateById(context => context.Message.OrderId));
+        Event(() => OrderCreated, x => x.CorrelateById(context => context.Message.OrderId));
         Event(() => PaymentAuthorizedEvent, x => x.CorrelateById(context => context.Message.OrderId));
         Event(() => PaymentAuthorizationFailedEvent, x => x.CorrelateById(context => context.Message.OrderId));
         Event(() => OrderShippedEvent, x => x.CorrelateById(context => context.Message.OrderId));
@@ -37,7 +37,7 @@ public class OrderStateMachine : MassTransitStateMachine<OrderStateMachineData>
 
 
         Initially(
-                When(OrderSubmitted)
+                When(OrderCreated)
                     .Then(context =>
                     {
                         context.Saga.OrderId = context.Message.OrderId;

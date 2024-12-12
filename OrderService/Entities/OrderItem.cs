@@ -1,5 +1,6 @@
 ﻿using FluentResults;
 
+
 namespace OrderService.Entities
 {
     public class OrderItem
@@ -8,12 +9,13 @@ namespace OrderService.Entities
         {
 
         }
-        public Guid Id { get; set;}
-        public OrderId OrderId { get; set; } = new OrderId(Guid.Empty);
-        public ProductId ProductId { get; set; } = new ProductId(Guid.Empty);
-        public Quantity Quantity { get; set; } = new Quantity(0);
-        public Money Price { get; set; } = new Money(0);
+        public Guid Id { get; private set; }
+        public OrderId OrderId { get; private set; } = new OrderId(Guid.Empty);
+        public ProductId ProductId { get; private set; } = new ProductId(Guid.Empty);
+        public Quantity Quantity { get; private set; } = new Quantity(0);
+        public Money Price { get; private set; } = new Money(0);
         public Money Total => Money.Create(Quantity.Value * Price.Value).ValueOrDefault;
+        public Order? Order { get; private set; }
 
         public static Result<OrderItem> Create(OrderId orderId, ProductId productId, Quantity quantity, Money price)
         {
@@ -29,7 +31,7 @@ namespace OrderService.Entities
             return Result.Ok(new OrderItem
             {
                 Id = Guid.NewGuid(),
-                OrderId= orderId!,
+                OrderId = orderId!,
                 ProductId = productId!,
                 Quantity = quantity!,
                 Price = price!

@@ -1,9 +1,10 @@
 ﻿using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using MongoDB.Driver;
+
 using OrderService.Abstractions;
 using OrderService.Database;
+using OrderService.Entities;
 using OrderService.Features;
 using OrderService.Features.Orders;
 using Refit;
@@ -15,21 +16,43 @@ namespace OrderService
     {
         public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
         {
-
-            var client = new MongoClient(configuration.GetConnectionString("Default"));
-            ApplicationContext.Create(client.GetDatabase("orders"));
-
+            services.AddDbContext<ApplicationContext>(options =>
+            {
+                options.UseNpgsql(configuration.GetConnectionString("default"));
+                options.EnableDetailedErrors();
+            }, contextLifetime: ServiceLifetime.Singleton);
 
             services.AddMediator(x => x.AddConsumersFromNamespaceContaining<Consumers>());
 
-            services.AddMassTransit(x =>
+            services.AddMassTransit(busConfiguration =>
             {
-                x.AddSagaStateMachine<OrderStateMachine, OrderStateMachineData>().InMemoryRepository();
+                busConfiguration.SetKebabCaseEndpointNameFormatter();
+
+                busConfiguration.AddConsumers(Assembly.GetExecutingAssembly());
+
+                busConfiguration.AddSagaStateMachine<OrderStateMachine, OrderStateMachineData>().EntityFrameworkRepository(config =>
+                {
+                    config.UsePostgres();
+                    config.ExistingDbContext<ApplicationContext>();
+                });
+
+                busConfiguration.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host(configuration.GetConnectionString("RabbitMq")!, "/", hst =>
+                    {
+                        hst.Username("guest");
+                        hst.Password("guest");
+                    });
+
+                    cfg.UseInMemoryOutbox(context);
+
+                    cfg.ConfigureEndpoints(context);
+                });
             });
 
             services.AddRefitClient<ICartApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:8081/api/v1"));
             services.AddRefitClient<IProductApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:8082/api/v1"));
-            
+
             return services;
         }
 

@@ -13,14 +13,25 @@ namespace OrderService.Features.Orders
     {
         public record OrderCreatedResponse
         {
-            public Guid Id { get;  set; }
+            public Guid Id { get; set; }
             public Guid UserId { get; set; }
-            public decimal Subtotal { get;  set; }
-            public decimal Taxes { get;  set; }
+            public decimal Subtotal { get; set; }
+            public decimal Taxes { get; set; }
             public decimal Total { get; set; }
-            public OrderStatus Status { get;  set; }
-            public ICollection<OrderItem> Items { get; set; } = new List<OrderItem>();
+            public OrderStatus Status { get; set; }
+            public ICollection<OrderItemResponse> Items { get; set; } = new HashSet<OrderItemResponse>();
         }
+
+        public record OrderItemResponse
+        {
+            public Guid Id { get; set; }
+            public string Name { get; set; } = string.Empty;
+            public decimal Quantity { get; set; }
+            public decimal Price { get; set; }
+            public decimal Total { get; set; }
+            
+        }
+
         public record Command : Request<Result<OrderCreatedResponse>>
         {
             public string CartId { get; set; } = string.Empty;
@@ -28,7 +39,6 @@ namespace OrderService.Features.Orders
             public PaymentMethod PaymentMethod { get; set; }
         }
 
-       
 
         public sealed class Handler(ICartApi cartApi, IProductApi productApi, ApplicationContext appContext, IBus bus) : MediatorRequestHandler<Command, Result<OrderCreatedResponse>>
         {
@@ -57,11 +67,11 @@ namespace OrderService.Features.Orders
 
 
                 // create order
-                var order = new Order();
+                var order = Order.Create(new UserId(request.UserId));
 
-                cartResult.Items.ToList().ForEach(item => 
+                cartResult.Items.ToList().ForEach(item =>
                 {
-                    var orderItemResult = OrderItem.Create(order.Id, new ProductId(item.ProductId), new Quantity(item.Quantity), new Money(item.Price));
+                    var orderItemResult = OrderItem.Create(order.OrderId, new ProductId(item.ProductId), new Quantity(item.Quantity), new Money(item.Price));
 
                     if (orderItemResult.IsFailed)
                         return;
@@ -73,29 +83,39 @@ namespace OrderService.Features.Orders
 
                 await appContext.SaveChangesAsync(cancellationToken);
 
-                
+                await bus.Publish(new OrderCreated(order.OrderId.Value, 
+                    request.UserId, 
+                    order.Total, 
+                    order.Items.Select(i => new OrderItemCreated(i.Id, i.OrderId, i.Quantity, i.Price)).ToArray()
+                    ), cancellationToken);
 
-                await bus.Publish(new OrderCreated(order.Id.Value, request.UserId, order.Total, [.. order.Items]), cancellationToken);
-
+                var responseItems = order.Items.Select(i => new OrderItemResponse
+                {
+                    Id = i.Id,
+                    Name = productResult.Value.FirstOrDefault(p => p.Id == i.ProductId.Value)!.Name,
+                    Price = i.Price.Value,
+                    Quantity = i.Quantity.Value,
+                    Total = i.Total.Value,
+                });
 
                 return Result.Ok(new OrderCreatedResponse
                 {
-                    Id = order.Id.Value,
+                    Id = order.OrderId.Value,
                     UserId = request.UserId,
                     Subtotal = order.Subtotal,
                     Taxes = order.Taxes,
                     Total = order.Total,
                     Status = order.Status,
-                    Items = order.Items.ToList()
+                    Items = responseItems.ToList()
                 });
             }
 
-           
+
             private async Task<Result<ProductModel>> GetAvailableProduct(CartItem item)
             {
                 var productResponse = await productApi.GetStock(item.ProductId);
 
-                if(!productResponse.IsSuccessful)
+                if (!productResponse.IsSuccessful)
                 {
                     return Result.Fail($"Product with id: {item.ProductId} not found");
                 }
@@ -103,13 +123,13 @@ namespace OrderService.Features.Orders
                 var product = productResponse.Content.Data!;
 
                 var result = Result.Merge(
-                    Result.FailIf(product.AvailableQuantity == 0,$"Product ${product.Name} is not available."),
-                    Result.FailIf(product.Price != item.Price, $"Product ${product.Name} has an invalid price.")
+                    Result.FailIf(product.AvailableQuantity == 0, $"Product {product.Name} is not available."),
+                    Result.FailIf(product.Price != item.Price, $"Product {product.Name} has an invalid price.")
                     );
 
-               if(result.IsFailed) return result;
+                if (result.IsFailed) return result;
 
-               return Result.Ok(product);
+                return Result.Ok(product);
             }
 
 

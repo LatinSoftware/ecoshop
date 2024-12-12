@@ -5,7 +5,7 @@ namespace OrderService.Features.Payments
 {
     public class PaymentCreate
     {
-        public sealed class Consumer(ILogger logger) : IConsumer<AuthorizePayment>
+        public sealed class AuthorizePaymentConsumer(ILogger<AuthorizePaymentConsumer> logger) : IConsumer<AuthorizePayment>
         {
             public async Task Consume(ConsumeContext<AuthorizePayment> context)
             {

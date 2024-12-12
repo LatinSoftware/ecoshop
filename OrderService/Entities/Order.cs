@@ -5,22 +5,31 @@ namespace OrderService.Entities
 {
     public class Order
     {
-        public Order()
+
+        private Order(UserId userId)
         {
-            Id = new OrderId(Guid.NewGuid());
+            OrderId = new OrderId(Guid.NewGuid());
+            UserId = userId;
+            UpdateTimestamp();
         }
-        public OrderId Id { get; private set; }
+
+        public OrderId OrderId { get; private set; }
+        public UserId UserId { get; private set; }
         public decimal Subtotal { get; private set; }
         public decimal Taxes { get; private set; }
         public decimal Total => Subtotal + Taxes;
         public OrderStatus Status { get; private set; } = OrderStatus.PENDING;
         public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
         public DateTime LastUpdatedAt { get; private set; } = DateTime.UtcNow;
-
         private readonly List<OrderItem> _items = [];
         public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
-        public PaymentInfo? PaymentInfo { get; private set; }
+        public Payment? Payment { get; private set; }
 
+
+        public static Order Create(UserId userId)
+        {
+            return new Order(userId);
+        }
 
         public Result AddItem(OrderItem item)
         {
@@ -53,17 +62,15 @@ namespace OrderService.Entities
             return Result.Ok();
         }
 
-
-        public Result SetPaymentInfo(PaymentInfo paymentInfo)
+        public Result SetPaymentInfo(Payment paymentInfo)
         {
             if (paymentInfo == null)
-                return Result.Fail($"Resource name {nameof(PaymentInfo)} cannot be null");
-            PaymentInfo = paymentInfo;
+                return Result.Fail($"Resource name {nameof(Payment)} cannot be null");
+            //Payment = paymentInfo;
             UpdateTimestamp();
             return Result.Ok();
         }
 
-       
         private void RecalculateSubtotal()
         {
             Subtotal = _items.Sum(item => item.Total.Value);
@@ -75,10 +82,7 @@ namespace OrderService.Entities
             LastUpdatedAt = DateTime.UtcNow;
         }
 
-        
     }
-
-    
 
     public enum OrderStatus
     {
