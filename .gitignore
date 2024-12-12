@@ -400,3 +400,4 @@ FodyWeavers.xsd
 *.sln.iml
 .vscode/launch.json
 .vscode/tasks.json
+/.containers/queue/data
