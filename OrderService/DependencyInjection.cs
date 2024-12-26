@@ -52,7 +52,7 @@ namespace OrderService
                     cfg.ConfigureEndpoints(context);
                 });
 
-                StripeConfiguration.ApiKey = "sk_test_51QWdyaGGs74eAK9sFFE5ApmUsiZy3sGk2zNChyXKIRW5a2dfahCD6fkxPCWzMMX0EsoJN4aVqehPd6X98clMx29600zJOlMFLf";
+                StripeConfiguration.ApiKey = "";
             });
 
             services.AddRefitClient<ICartApi>().ConfigureHttpClient(c => c.BaseAddress = new Uri("https://localhost:8081/api/v1"));

@@ -14,9 +14,13 @@ namespace ProductService.Features.Categories.Create
                 var result = await sender.Send(command);
 
                 return result.Match(
-                    onSuccess: () => Results.Created($"categories/{result.Value.Id}", result.ToApiResponse(StatusCodes.Status201Created)), 
+                    onSuccess: () => Results.Created($"categories/{result.Value.Id}", result.ToApiResponse(StatusCodes.Status201Created)),
                     onError: (error) => Results.BadRequest(result.ToApiResponse(errorCode: StatusCodes.Status404NotFound)));
-            }) ;
+            })
+                .WithName(Constants.Category.CreateEndpointName)
+                .WithTags(Constants.Category.Tag)
+                ;
+
         }
     }
 }
