@@ -40,7 +40,12 @@ namespace OrderService.Features.Orders
         }
 
 
-        public sealed class Handler(ICartApi cartApi, IProductApi productApi, ApplicationContext appContext, IBus bus) : MediatorRequestHandler<Command, Result<OrderCreatedResponse>>
+        public sealed class Handler(
+            ICartApi cartApi, 
+            IProductApi productApi,
+            IPaymentService paymentService,
+            ApplicationContext appContext, 
+            IBus bus) : MediatorRequestHandler<Command, Result<OrderCreatedResponse>>
         {
             protected override async Task<Result<OrderCreatedResponse>> Handle(Command request, CancellationToken cancellationToken)
             {
@@ -63,8 +68,12 @@ namespace OrderService.Features.Orders
                     return Result.Fail(productResult.Errors);
 
                 // create payment authorization
+                var paymentResult = await paymentService.Intent(new PaymentIntentModel.Request(cartResult.Total, "usd"));
 
-
+                if (paymentResult.IsFailed)
+                {
+                    return Result.Fail(paymentResult.Errors);
+                }
 
                 // create order
                 var order = Order.Create(new UserId(request.UserId));
@@ -85,7 +94,8 @@ namespace OrderService.Features.Orders
 
                 await bus.Publish(new OrderCreated(order.OrderId.Value, 
                     request.UserId, 
-                    order.Total, 
+                    paymentResult.Value.Id,
+                    order.Total,
                     order.Items.Select(i => new OrderItemCreated(i.Id, i.OrderId, i.Quantity, i.Price)).ToArray()
                     ), cancellationToken);
 

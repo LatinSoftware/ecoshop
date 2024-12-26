@@ -8,15 +8,15 @@ public class OrderStateMachine : MassTransitStateMachine<OrderStateMachineData>
 {
 
     public State Pending { get; private set; }
-    public State PaymentAuthorized { get; private set; }
+    public State PaymentConfirmed { get; private set; }
     public State Shipped { get; private set; }
     public State Delivered { get; private set; }
     public State Failed { get; private set; }
     public State Cancelled { get; private set; }
 
     public Event<OrderCreated> OrderCreated { get; private set; }
-    public Event<PaymentAuthorized> PaymentAuthorizedEvent { get; private set; }
-    public Event<PaymentAuthorizationFailed> PaymentAuthorizationFailedEvent { get; private set; }
+    public Event<PaymentConfirmed> PaymentConfirmedEvent { get; private set; }
+    public Event<PaymentAuthorizationFailed> PaymentConfirmationFailedEvent { get; private set; }
     public Event<OrderShipped> OrderShippedEvent { get; private set; }
     public Event<ShippingFailed> ShippingFailedEvent { get; private set; }
     public Event<OrderDelivered> OrderDeliveredEvent { get; private set; }
@@ -28,8 +28,8 @@ public class OrderStateMachine : MassTransitStateMachine<OrderStateMachineData>
         InstanceState(x => x.CurrentState);
 
         Event(() => OrderCreated, x => x.CorrelateById(context => context.Message.OrderId));
-        Event(() => PaymentAuthorizedEvent, x => x.CorrelateById(context => context.Message.OrderId));
-        Event(() => PaymentAuthorizationFailedEvent, x => x.CorrelateById(context => context.Message.OrderId));
+        Event(() => PaymentConfirmedEvent, x => x.CorrelateById(context => context.Message.OrderId));
+        Event(() => PaymentConfirmationFailedEvent, x => x.CorrelateById(context => context.Message.OrderId));
         Event(() => OrderShippedEvent, x => x.CorrelateById(context => context.Message.OrderId));
         Event(() => ShippingFailedEvent, x => x.CorrelateById(context => context.Message.OrderId));
         Event(() => OrderDeliveredEvent, x => x.CorrelateById(context => context.Message.OrderId));
@@ -41,19 +41,19 @@ public class OrderStateMachine : MassTransitStateMachine<OrderStateMachineData>
                     .Then(context =>
                     {
                         context.Saga.OrderId = context.Message.OrderId;
+                        context.Saga.PaymentIntentId = context.Message.PaymentIntentId;
                         context.Saga.CreatedAt = DateTime.UtcNow;
                     })
                     .TransitionTo(Pending)
-                    .Publish(context => new AuthorizePayment(context.Saga.OrderId, context.Message.TotalAmount)));
+                    .Publish(context => new ConfirmPayment(context.Saga.OrderId, context.Message.PaymentIntentId, context.Message.TotalAmount)));
 
         During(Pending, 
-            When(PaymentAuthorizedEvent)
-            .Then(context => context.Saga.PaymentTransactionId = context.Message.TransactionId)
-            .TransitionTo(PaymentAuthorized),
-            When(PaymentAuthorizationFailedEvent).TransitionTo(Failed)
+            When(PaymentConfirmedEvent)
+            .TransitionTo(PaymentConfirmed),
+            When(PaymentConfirmationFailedEvent).TransitionTo(Failed)
             );
 
-        During(PaymentAuthorized,
+        During(PaymentConfirmed,
             When(OrderShippedEvent).TransitionTo(Shipped),
             When(ShippingFailedEvent).TransitionTo(Failed)
             );

@@ -30,7 +30,7 @@ public class UserFilterTest : BaseTest
 
 
         var userCount = await context.Users.CountAsync();
-        result.Value.TotalItems.Should().Be(userCount);
+        result.Value.Metadata.TotalItems.Should().Be(userCount);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public class UserFilterTest : BaseTest
         result.IsFailed.Should().BeFalse();
 
         var userCount = await context.Users.CountAsync(x => x.Name.ToLower().Contains(query.Name.ToLower()));
-        result.Value.TotalItems.Should().Be(userCount);
+        result.Value.Metadata.TotalItems.Should().Be(userCount);
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public class UserFilterTest : BaseTest
         result.IsFailed.Should().BeFalse();
 
         var userCount = await context.Users.CountAsync(x => x.Email == new Email(query.Email));
-        result.Value.TotalItems.Should().Be(userCount);
+        result.Value.Metadata.TotalItems.Should().Be(userCount);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class UserFilterTest : BaseTest
         result.IsFailed.Should().BeFalse();
         result.Value.Data.Should().NotBeEmpty();
         var userCount = await context.Users.CountAsync(x => x.Address.City.Contains(query.City) && x.Address.Country.Contains(query.Country));
-        result.Value.TotalItems.Should().Be(userCount);
+        result.Value.Metadata.TotalItems.Should().Be(userCount);
     }
 
     [Fact]
