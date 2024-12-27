@@ -57,6 +57,15 @@ namespace ProductService
                 endpoint.MapEndpoint(builder);
             }
 
+            var logger = app.Logger;
+
+            foreach (var endpoint in builder.DataSources.SelectMany(ds => ds.Endpoints))
+            {
+
+                logger.LogInformation($"Endpoint encontrado: {endpoint.DisplayName}");
+            }
+
+
             return app;
         }
     }
